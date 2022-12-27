@@ -7,7 +7,7 @@ export default function Navbar() {
   const userEmail = session?.user?.email
 
   return (
-    <nav className={styles.navbar}>
+    <nav className="flex gap-4">
       {status === "authenticated" ? (
         <p>Signed in as {userEmail}</p>
       ) : (<></>)
