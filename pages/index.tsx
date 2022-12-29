@@ -4,6 +4,7 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useSession, signIn, signOut } from "next-auth/react"
 import Navbar from '../components/navbar'
+import PlaceList from '../components/placeList'
 
 const Home: NextPage = () => {
   const { data: session } = useSession()
@@ -26,6 +27,7 @@ const Home: NextPage = () => {
                   Insert content here
                 </p>
               </div>
+              <PlaceList></PlaceList>
             </div>
           ) : (
             <p>You need to sign in to save your progress</p>
