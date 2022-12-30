@@ -45,6 +45,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  Plan          Plan[]
 }
 
 model VerificationToken {
@@ -53,4 +54,37 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Plan {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  title     String
+  createdAt DateTime @default(now())
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  Locations Location[]
+}
+
+model Location {
+  id     Int @id @default(autoincrement())
+  planId Int
+
+  name      String
+  notes     String?
+  category  Category @default(SIGHTSEEING)
+  scheduled Boolean  @default(false)
+
+  plan Plan @relation(fields: [planId], references: [id])
+}
+
+enum Category {
+  SIGHTSEEING
+  FOOD
+  ACTIVITIES
+  OTHERS
 }
