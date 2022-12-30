@@ -38,6 +38,8 @@ Pushing changes to database schema
 
 ```bash
 npx prisma db push
+
+npx prisma generate
 ```
 
 Adding data

@@ -2,11 +2,14 @@ import styles from '../styles/Home.module.css'
 
 import { useSession } from "next-auth/react"
 import PlaceCard from './placeCard';
+import { NextPage } from 'next';
 
-export default function PlaceList() {
-  const { data: session, status } = useSession()
+interface Props {
+  places: string[];
+}
 
-  const places = ['ONE', 'TWO', 'THREE', '4', '5', '6', '7', '8'];
+const PlaceList: NextPage<Props> = (props) => {
+  const { places } = props;
 
   return (
     <div>
@@ -19,3 +22,5 @@ export default function PlaceList() {
     </div>
   );
 };
+
+export default PlaceList;

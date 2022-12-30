@@ -5,9 +5,17 @@ import styles from '../styles/Home.module.css'
 import { useSession, signIn, signOut } from "next-auth/react"
 import Navbar from '../components/navbar'
 import PlaceList from '../components/placeList'
+import useSwr from 'swr'
+import fetcher from '../lib/fetcher'
 
 const Home: NextPage = () => {
   const { data: session } = useSession()
+
+  const places = ['ONE', 'TWO', 'THREE', '4', '5', '6', '7', '8'];
+
+  const { data, error, isLoading } = useSwr('/api/user/' + session?.user.id, fetcher)
+
+  console.log(data);
 
   return (
     <div className="container mx-auto">
@@ -27,14 +35,14 @@ const Home: NextPage = () => {
                   Insert content here
                 </p>
               </div>
-              <PlaceList></PlaceList>
+              <PlaceList places={places}></PlaceList>
             </div>
           ) : (
             <p>You need to sign in to save your progress</p>
           )}
         </div>
-      </main>
-    </div>
+      </main >
+    </div >
   )
 }
 
