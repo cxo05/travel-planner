@@ -5,11 +5,15 @@ import styles from '../styles/Home.module.css'
 import { useSession, signIn, signOut } from "next-auth/react"
 import Navbar from '../components/navbar'
 import PlaceList from '../components/placeList'
+import DatePicker from '../components/datePicker'
+import { useState } from 'react'
 import useSwr from 'swr'
 import fetcher from '../lib/fetcher'
 
 const Home: NextPage = () => {
   const { data: session } = useSession()
+
+  let [daysNum, setDaysNum] = useState(0)
 
   const places = ['ONE', 'TWO', 'THREE', '4', '5', '6', '7', '8'];
 
@@ -35,6 +39,7 @@ const Home: NextPage = () => {
                   Insert content here
                 </p>
               </div>
+              <DatePicker getDaysNum={setDaysNum}></DatePicker>
               <PlaceList places={places}></PlaceList>
             </div>
           ) : (
