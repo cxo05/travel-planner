@@ -12,7 +12,8 @@ const PlaceList: NextPage<Props> = (props) => {
   const { places } = props;
 
   return (
-    <div>
+    <div className='mt-10'>
+      <p>Places To Visit</p>
       <div className="grid grid-cols-4 gap-4">
         <PlaceCard name="Add"></PlaceCard>
         {places.map((obj) => (

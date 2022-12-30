@@ -9,6 +9,7 @@ import DatePicker from '../components/datePicker'
 import { useState } from 'react'
 import useSwr from 'swr'
 import fetcher from '../lib/fetcher'
+import TimeLine from '../components/timeline'
 
 const Home: NextPage = () => {
   const { data: session } = useSession()
@@ -29,19 +30,17 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar></Navbar>
-      <main className={styles.main}>
+      <main>
         <div>
           {session && session.user ? (
-            <div className={styles.card}>
-              <div className={styles.cardContent}>
-                <h2 className="text-3xl">Hello World</h2>
-                <p>
-                  Insert content here
-                </p>
+            <>
+              <div>
+                <p>Select Days</p>
+                <DatePicker getDaysNum={setDaysNum}></DatePicker>
+                <TimeLine daysNum={daysNum}></TimeLine>
               </div>
-              <DatePicker getDaysNum={setDaysNum}></DatePicker>
               <PlaceList places={places}></PlaceList>
-            </div>
+            </>
           ) : (
             <p>You need to sign in to save your progress</p>
           )}
