@@ -5,9 +5,13 @@ import styles from '../styles/Home.module.css'
 import { useSession, signIn, signOut } from "next-auth/react"
 import Navbar from '../components/navbar'
 import PlaceList from '../components/placeList'
+import DatePicker from '../components/datePicker'
+import { useState } from 'react'
 
 const Home: NextPage = () => {
   const { data: session } = useSession()
+
+  let [daysNum, setDaysNum] = useState(0)
 
   return (
     <div className="container mx-auto">
@@ -27,7 +31,8 @@ const Home: NextPage = () => {
                   Insert content here
                 </p>
               </div>
-              <PlaceList></PlaceList>
+              <DatePicker getDaysNum={setDaysNum}></DatePicker>
+              <PlaceList daysNum={daysNum}></PlaceList>
             </div>
           ) : (
             <p>You need to sign in to save your progress</p>
