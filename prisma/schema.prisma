@@ -57,7 +57,7 @@ model VerificationToken {
 }
 
 model Plan {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   userId    String
   title     String
   createdAt DateTime @default(now())
@@ -71,8 +71,8 @@ model Plan {
 }
 
 model Location {
-  id     Int @id @default(autoincrement())
-  planId Int
+  id     Int    @id @default(autoincrement())
+  planId String
 
   name      String
   notes     String?
