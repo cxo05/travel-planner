@@ -1,6 +1,8 @@
 import styles from '../styles/Home.module.css'
 
 import { NextPage } from "next";
+import { Card } from 'primereact/card';
+import { Button } from 'primereact/button'
 
 interface Props {
   name: string;
@@ -9,8 +11,15 @@ interface Props {
 const PlaceCard: NextPage<Props> = (props) => {
   const { name } = props;
 
+  const footer = <div>
+    <Button label="Edit" icon="pi pi-check" style={{ marginRight: '.25em' }} />
+    <Button label="Delete" icon="pi pi-times" className="p-button-secondary" />
+  </div>
+
   return (
-    <div className="flex justify-center h-32 bg-slate-200">{name}</div>
+    <Card title={name} footer={footer}>
+      <p>Insert Notes Here</p>
+    </Card>
   )
 };
 
