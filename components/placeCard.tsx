@@ -12,12 +12,16 @@ const PlaceCard: NextPage<Props> = (props) => {
   const { name } = props;
 
   const footer = <div>
-    <Button label="Edit" icon="pi pi-check" style={{ marginRight: '.25em' }} />
-    <Button label="Delete" icon="pi pi-times" className="p-button-secondary" />
+    <Button label="Edit" className="p-button-sm mr-1" />
+  </div>
+
+  const title = <div className='flex justify-between'>
+    <p>{name}</p>
+    <Button icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" aria-label="Cancel" />
   </div>
 
   return (
-    <Card title={name} footer={footer}>
+    <Card title={title} footer={footer}>
       <p>Insert Notes Here</p>
     </Card>
   )
