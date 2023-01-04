@@ -13,6 +13,7 @@ import "primereact/resources/themes/bootstrap4-light-blue/theme.css";  //theme
 import "primereact/resources/primereact.min.css";                  //core css
 import "primeicons/primeicons.css";
 
+import { BreadCrumb } from 'primereact/breadcrumb';
 
 const Home: NextPage = () => {
   const { data: session } = useSession()
@@ -23,6 +24,19 @@ const Home: NextPage = () => {
 
   const { data, error, isLoading } = useSwr(`/api/user/${session?.user.id}`, fetcher)
 
+  const plans = [
+    {
+      label: 'Plans',
+      command: () => { window.location.hash = "/"; },
+      items: [
+        { label: 'My Plan', command: () => { window.location.hash = "/myplan"; } },
+        { label: 'Plan 2', command: () => { window.location.hash = "/myplan2"; } }
+      ]
+    },
+  ];
+
+  const home = { icon: 'pi pi-home', command: () => { window.location.hash = "/"; } }
+
   return (
     <div className="container mx-auto">
       <Head>
@@ -32,9 +46,7 @@ const Home: NextPage = () => {
       </Head>
       <Navbar></Navbar>
       <main>
-        <div>
-
-        </div>
+        <BreadCrumb model={plans} home={home} />
         <div>
           {session && session.user ? (
             <>
