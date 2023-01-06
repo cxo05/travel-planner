@@ -6,10 +6,11 @@ import { Button } from 'primereact/button'
 
 interface Props {
   name: string;
+  notes: string;
 }
 
 const PlaceCard: NextPage<Props> = (props) => {
-  const { name } = props;
+  const { name, notes } = props;
 
   const footer = <div>
     <Button label="Edit" className="p-button-sm mr-1" />
@@ -22,7 +23,7 @@ const PlaceCard: NextPage<Props> = (props) => {
 
   return (
     <Card title={title} footer={footer}>
-      <p>Insert Notes Here</p>
+      <p>{notes}</p>
     </Card>
   )
 };

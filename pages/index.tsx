@@ -1,68 +1,57 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
 import { useSession } from "next-auth/react"
-import Navbar from '../components/navbar'
-import PlaceList from '../components/placeList'
-import DatePicker from '../components/datePicker'
 import { useState } from 'react'
-import TimeLine from '../components/timeline'
 import useSwr from 'swr'
 import fetcher from '../lib/fetcher'
 
-import "primereact/resources/themes/bootstrap4-light-blue/theme.css";  //theme
-import "primereact/resources/primereact.min.css";                  //core css
-import "primeicons/primeicons.css";
-
 import { BreadCrumb } from 'primereact/breadcrumb';
+
+import SampleData from "./api/data.json";
+import Link from 'next/link'
+import { Button } from 'primereact/button'
+
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column'
 
 const Home: NextPage = () => {
   const { data: session } = useSession()
 
   let [daysNum, setDaysNum] = useState(0)
 
-  const places = ['ONE', 'TWO', 'THREE', '4', '5', '6', '7', '8'];
+  const plans = SampleData.Plans;
 
-  const { data, error, isLoading } = useSwr(`/api/user/${session?.user.id}`, fetcher)
+  //const { data, error, isLoading } = useSwr(`/api/user/${session?.user.id}`, fetcher)
 
-  const plans = [
+  const breadcrumbMenu = [
     {
       label: 'Plans',
       command: () => { window.location.hash = "/"; },
-      items: [
-        { label: 'My Plan', command: () => { window.location.hash = "/myplan"; } },
-        { label: 'Plan 2', command: () => { window.location.hash = "/myplan2"; } }
-      ]
     },
   ];
 
   const home = { icon: 'pi pi-home', command: () => { window.location.hash = "/"; } }
 
   return (
-    <div className="container mx-auto">
-      <Head>
-        <title>Travel Planner</title>
-        <meta name="description" content="Travel Planner" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Navbar></Navbar>
-      <main>
-        <BreadCrumb model={plans} home={home} />
-        <div>
-          {session && session.user ? (
-            <>
-              <div>
-                <p>Select Days</p>
-                <DatePicker getDaysNum={setDaysNum}></DatePicker>
-                <TimeLine daysNum={daysNum}></TimeLine>
-              </div>
-              <PlaceList places={places}></PlaceList>
-            </>
-          ) : (
-            <p>You need to sign in to save your progress</p>
-          )}
-        </div>
-      </main >
-    </div >
+    <main>
+      <BreadCrumb model={breadcrumbMenu} home={home} />
+      <div>
+        {session && session.user ? (
+          <>
+            <DataTable selectionMode="single" value={plans} responsiveLayout="scroll"
+              onRowClick={(event) => {
+                window.location.href = "/plans/" + event.data.id;
+              }}
+            >
+              <Column field="title" header="Title"></Column>
+              <Column field="startDate" header="Start Date"></Column>
+              <Column field="endDate" header="End Date"></Column>
+            </DataTable>
+          </>
+        ) : (
+          <p>You need to sign in to save your progress</p>
+        )}
+      </div>
+    </main >
   )
 }
 

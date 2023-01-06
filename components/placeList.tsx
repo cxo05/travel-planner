@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Button } from 'primereact/button';
 
 interface Props {
-  places: string[];
+  places: { name: string; notes: string; category: string; }[];
 }
 
 const PlaceList: NextPage<Props> = (props) => {
@@ -34,19 +34,39 @@ const PlaceList: NextPage<Props> = (props) => {
       <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
         <TabPanel header="Sightseeing">
           <div className="grid grid-cols-4 gap-4">
-            {places.map((obj) => (
-              <PlaceCard key={obj} name={obj}></PlaceCard>
+            {places.filter((obj) => {
+              return obj.category == "SIGHTSEEING"
+            }).map((obj) => (
+              <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
             ))}
           </div>
         </TabPanel>
         <TabPanel header="Food">
-          Content II
+          <div className="grid grid-cols-4 gap-4">
+            {places.filter((obj) => {
+              return obj.category == "FOOD"
+            }).map((obj) => (
+              <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
+            ))}
+          </div>
         </TabPanel>
         <TabPanel header="Activities">
-          Content III
+          <div className="grid grid-cols-4 gap-4">
+            {places.filter((obj) => {
+              return obj.category == "ACTIVITIES"
+            }).map((obj) => (
+              <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
+            ))}
+          </div>
         </TabPanel>
         <TabPanel header="Others">
-          Content III
+          <div className="grid grid-cols-4 gap-4">
+            {places.filter((obj) => {
+              return obj.category == "OTHERS"
+            }).map((obj) => (
+              <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
+            ))}
+          </div>
         </TabPanel>
       </TabView>
     </div>

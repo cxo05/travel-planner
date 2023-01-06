@@ -1,0 +1,32 @@
+{
+  "Plans": [
+    {
+      "id": "0",
+      "title": "Plan 1",
+      "startDate": "",
+      "endDate": "",
+      "Locations": [
+        {
+          "name": "Food Place 1",
+          "notes": "Good food",
+          "category": "FOOD"
+        },
+        {
+          "name": "Food Place 2",
+          "notes": "Good food",
+          "category": "FOOD"
+        },
+        {
+          "name": "Mountain 1",
+          "notes": "Good view",
+          "category": "SIGHTSEEING"
+        },
+        {
+          "name": "Mountain 2",
+          "notes": "Good view",
+          "category": "SIGHTSEEING"
+        }
+      ]
+    }
+  ]
+}
