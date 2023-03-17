@@ -1,29 +1,26 @@
-import styles from '../styles/Home.module.css'
-
-import { useSession } from "next-auth/react"
-import PlaceCard from './placeCard';
 import { NextPage } from 'next';
-import DayCard from './dayCard';
+import dynamic from 'next/dynamic';
 
 interface Props {
-  daysNum: number;
+  dates: Date[];
 }
 
 const TimeLine: NextPage<Props> = (props) => {
-  const dayCards = (days: number) => {
+  const DayCard = dynamic(() => import("./dayCard"), {
+    ssr: false,
+  })
+
+  const dayCards = (dates: Date[]) => {
     let content = []
-    for (let i = 0; i < days; i++) {
-      content.push(<DayCard key={i} name={i + ''}></DayCard>);
+    for (let i = 0; i < dates.length; i++) {
+      content.push(<DayCard key={i} date={dates.at(i)}></DayCard>);
     }
     return content;
   }
 
   return (
-    <div>
-      <p>Timeline</p>
-      <div className="grid grid-cols-4 gap-4">
-        {dayCards(props.daysNum)}
-      </div>
+    <div className="flex gap-4">
+      {dayCards(props.dates)}
     </div>
   );
 };

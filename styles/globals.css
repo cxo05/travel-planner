@@ -23,5 +23,25 @@ a {
 /* Override Primereact Styling */
 
 .p-tabview-nav-container {
-  display: none; 
+  display: none;
+}
+
+#custom thead {
+  display: none;
+}
+
+table {
+  height: 1px;
+}
+
+tr {
+  height: 100%;
+}
+
+td {
+  height: 100%;
+}
+
+td>div {
+  height: 100%;
 }
