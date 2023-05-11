@@ -12,6 +12,20 @@ interface Plans {
 const Home: NextPage<Plans> = ({ plans }) => {
   const { data: session } = useSession()
 
+  async function handleNewPlan() {
+    fetch('api/plan', {
+      body: JSON.stringify({ title: 'New Plan' }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    }).then((res) => {
+      return res.json() as Promise<{ data: Plan }>
+    }).then((data) => {
+      viewPlan(data.data.id)
+    })
+  }
+
   const viewPlan = (id: String) => {
     window.location.href = "/plans/" + id;
   }
@@ -29,7 +43,7 @@ const Home: NextPage<Plans> = ({ plans }) => {
                   {obj.endDate ? <p>{new Date(obj.endDate).toDateString()}</p> : <></>}
                 </Card>
               ))}
-              <div className='grid custom-card bg-slate-300 hover:bg-slate-600 place-content-center' onClick={() => alert("TODO Create New Plan")}>
+              <div className='grid custom-card bg-slate-300 hover:bg-slate-600 place-content-center' onClick={() => handleNewPlan()}>
                 <i className='pi pi-plus text-4xl'></i>
               </div>
             </div>
