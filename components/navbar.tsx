@@ -4,7 +4,7 @@ import { useSession, signIn, signOut } from "next-auth/react"
 
 export default function Navbar() {
   const { data: session, status } = useSession()
-  const userEmail = session?.user?.email
+  const userEmail = session?.user?.name
 
   return (
     <nav className="flex flex-col justify-center overflow-hidden bg-gray-50">
@@ -12,7 +12,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between border-b container mx-auto p-3">
           <div className="text-lg font-bold text-gray-100">Travel Planner</div>
           <div className="flex items-center space-x-5 text-gray-100">
-            {status === "authenticated" && <p>Signed in as {userEmail}</p>}
+            {status === "authenticated" && <p>{userEmail}</p>}
             <div className={styles.signup}>
               {status === "authenticated" ? (
                 <button onClick={() => signOut()} className="rounded bg-gray-100 py-1 px-2 text-slate-500 shadow-md">Sign out</button>

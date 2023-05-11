@@ -62,24 +62,37 @@ model Plan {
   title     String
   createdAt DateTime @default(now())
 
-  startDate DateTime?
+  startDate DateTime  @default(now())
   endDate   DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  Locations Location[]
+  Items          Item[]
+  ScheduledItems ScheduledItem[]
 }
 
-model Location {
+model ScheduledItem {
+  id     Int    @id @default(autoincrement())
+  ItemId Int
+  planId String
+
+  startDate DateTime
+  endDate   DateTime
+
+  Item Item @relation(fields: [ItemId], references: [id])
+  Plan Plan @relation(fields: [planId], references: [id])
+}
+
+model Item {
   id     Int    @id @default(autoincrement())
   planId String
 
-  name      String
-  notes     String?
-  category  Category @default(SIGHTSEEING)
-  scheduled Boolean  @default(false)
+  name     String
+  notes    String?
+  category Category @default(SIGHTSEEING)
 
-  plan Plan @relation(fields: [planId], references: [id])
+  plan          Plan            @relation(fields: [planId], references: [id])
+  ScheduledItem ScheduledItem[]
 }
 
 enum Category {

@@ -1,10 +1,10 @@
 import React from 'react';
 import { NextPage } from "next";
-import { Calendar, CalendarChangeParams } from 'primereact/calendar';
+import { Calendar } from 'primereact/calendar';
 
 interface Props {
   value: Date | undefined;
-  onChange: (e: CalendarChangeParams) => void;
+  onChange: (e: any) => void;
 }
 
 const DatePicker: NextPage<Props> = (props) => {
