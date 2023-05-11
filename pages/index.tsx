@@ -4,6 +4,7 @@ import { getSession, useSession } from "next-auth/react"
 import { Card } from 'primereact/card';
 import prisma from '../lib/prisma';
 import { Plan } from '@prisma/client';
+import { useState } from 'react';
 
 interface Plans {
   plans: Plan[]
@@ -11,18 +12,21 @@ interface Plans {
 
 const Home: NextPage<Plans> = ({ plans }) => {
   const { data: session } = useSession()
+  const [loading, setLoading] = useState(false)
 
   async function handleNewPlan() {
+    setLoading(true)
     fetch('api/plan', {
-      body: JSON.stringify({ title: 'New Plan' }),
+      body: JSON.stringify({ title: 'New Plan', userId: session?.user.id }),
       headers: {
         'Content-Type': 'application/json'
       },
       method: 'POST'
     }).then((res) => {
-      return res.json() as Promise<{ data: Plan }>
+      return res.json() as Promise<Plan>
     }).then((data) => {
-      viewPlan(data.data.id)
+      console.log(data);
+      viewPlan(data.id)
     })
   }
 
@@ -44,7 +48,9 @@ const Home: NextPage<Plans> = ({ plans }) => {
                 </Card>
               ))}
               <div className='grid custom-card bg-slate-300 hover:bg-slate-600 place-content-center' onClick={() => handleNewPlan()}>
-                <i className='pi pi-plus text-4xl'></i>
+                {loading ?
+                  <i className='pi pi-spin pi-spinner text-4xl'></i> :
+                  <i className='pi pi-plus text-4xl'></i>}
               </div>
             </div>
           </>

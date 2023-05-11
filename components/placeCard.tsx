@@ -6,7 +6,7 @@ import { DragPreviewImage, useDrag } from "react-dnd";
 
 interface Props {
   name: string;
-  notes: string;
+  notes: string | null;
 }
 
 export const ItemTypes = {

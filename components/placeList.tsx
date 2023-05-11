@@ -6,9 +6,10 @@ import { SelectButton } from 'primereact/selectbutton';
 import { useState } from 'react';
 import { Button } from 'primereact/button';
 import PopUpDialog from './popUpDialog';
+import { Item } from '@prisma/client';
 
 interface Props {
-  places: { name: string; notes: string; category: string; }[];
+  places: Item[];
 }
 
 const PlaceList: NextPage<Props> = (props) => {
@@ -53,7 +54,7 @@ const PlaceList: NextPage<Props> = (props) => {
     handlePopUp(true);
   }
 
-  const addNewPlace = (data: { name: string; notes: string; category: string }) => {
+  const addNewPlace = (data: Item) => {
     setCurrPlaces(currPlaces.concat(data));
   }
 
@@ -70,7 +71,7 @@ const PlaceList: NextPage<Props> = (props) => {
       <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
         <TabPanel header="Sightseeing">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces.filter((obj) => {
+            {currPlaces?.filter((obj) => {
               return obj.category == "SIGHTSEEING"
             }).map((obj) => (
               <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
@@ -79,7 +80,7 @@ const PlaceList: NextPage<Props> = (props) => {
         </TabPanel>
         <TabPanel header="Food">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces.filter((obj) => {
+            {currPlaces?.filter((obj) => {
               return obj.category == "FOOD"
             }).map((obj) => (
               <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
@@ -88,7 +89,7 @@ const PlaceList: NextPage<Props> = (props) => {
         </TabPanel>
         <TabPanel header="Activities">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces.filter((obj) => {
+            {currPlaces?.filter((obj) => {
               return obj.category == "ACTIVITIES"
             }).map((obj) => (
               <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
@@ -97,7 +98,7 @@ const PlaceList: NextPage<Props> = (props) => {
         </TabPanel>
         <TabPanel header="Others">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces.filter((obj) => {
+            {currPlaces?.filter((obj) => {
               return obj.category == "OTHERS"
             }).map((obj) => (
               <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>

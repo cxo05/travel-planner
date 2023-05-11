@@ -5,12 +5,13 @@ import { classNames } from 'primereact/utils';
 import { NextPage } from "next";
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { Item } from '@prisma/client';
 
 interface Props {
   display: boolean;
   header: string,
   handlePopUp: (show: boolean) => void;
-  addNewPlace: (data: { name: string; notes: string; category: string; }) => void;
+  addNewPlace: (data: Item) => void;
 }
 
 const PopUpDialog: NextPage<Props> = (props) => {

@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-const prisma = new PrismaClient()
+import prisma from '../../../lib/prisma'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const {
@@ -15,6 +14,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const getPlan = await prisma.plan.findUnique({
         where: {
           id: String(id),
+        },
+        include: {
+          Items: true
         }
       })      
       res.json(getPlan)
