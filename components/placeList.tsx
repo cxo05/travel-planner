@@ -6,19 +6,32 @@ import { SelectButton } from 'primereact/selectbutton';
 import { useState } from 'react';
 import { Button } from 'primereact/button';
 import PopUpDialog from './popUpDialog';
-import { Item } from '@prisma/client';
+import { Category, Item } from '@prisma/client';
+import useSWR from 'swr';
+import { useRouter } from 'next/router';
+import fetcher from '../lib/fetcher'
 
-interface Props {
-  places: Item[];
-}
+// interface Props {
+//   places: Item[];
+// }
 
-const PlaceList: NextPage<Props> = (props) => {
-  const { places } = props;
+//const PlaceList: NextPage<Props> = (props) => {
+const PlaceList = () => {
+  //const { places } = props;
+  const router = useRouter()
+  const { id } = router.query
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [display, setDisplay] = useState(false);
-  const [displayHeader, setDisplayHeader] = useState('');
-  const [currPlaces, setCurrPlaces] = useState(places);
+  const [displayHeader, setDisplayHeader] = useState<Category>('SIGHTSEEING');
+
+  const { data, error } = useSWR<Item[], Error>(`/api/item?planId=${id}`, fetcher)
+  if (error) return <div>An error occured. {error.message}</div>
+  if (!data) return <div>Loading ...</div>
+
+  console.log(data);
+
+  let currPlaces = data;
 
   const options = [
     { label: 'Sightseeing', value: 0 },
@@ -28,45 +41,34 @@ const PlaceList: NextPage<Props> = (props) => {
   ];
 
   const handlePopUp = (show: boolean) => {
-    let category = "";
+    let category: Category = 'SIGHTSEEING';
     switch (activeIndex) {
       case 0:
-        category = "Sightseeing";
+        category = "SIGHTSEEING";
         break;
       case 1:
-        category = "Food";
+        category = "FOOD";
         break;
       case 2:
-        category = "Activities";
+        category = "ACTIVITIES";
         break;
       case 3:
-        category = "Others";
-        break;
-      default:
-        category = "";
+        category = "OTHERS";
         break;
     }
     setDisplayHeader(category);
     setDisplay(show);
   }
 
-  const showPopUp = () => {
-    handlePopUp(true);
-  }
-
-  const addNewPlace = (data: Item) => {
-    setCurrPlaces(currPlaces.concat(data));
-  }
-
   return (
-    <div className='mt-10 pt-4 select-none'>
+    <div className='pt-4 select-none'>
       <div className="flex items-center justify-center mx-5">
-        <PopUpDialog display={display} header={displayHeader} handlePopUp={handlePopUp} addNewPlace={addNewPlace}></PopUpDialog>
+        <PopUpDialog display={display} header={displayHeader} handlePopUp={handlePopUp}></PopUpDialog>
         <p className='text-lg font-bold'>Places</p>
         <div className='flex-grow'></div>
         <SelectButton value={activeIndex} options={options} unselectable={false} onChange={(e) => setActiveIndex(e.value)}></SelectButton>
         <div className='flex-grow'></div>
-        <Button icon="pi pi-plus" className="p-button-rounded" onClick={showPopUp}></Button>
+        <Button icon="pi pi-plus" className="p-button-rounded" onClick={() => handlePopUp(true)}></Button>
       </div>
       <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
         <TabPanel header="Sightseeing">
@@ -74,7 +76,7 @@ const PlaceList: NextPage<Props> = (props) => {
             {currPlaces?.filter((obj) => {
               return obj.category == "SIGHTSEEING"
             }).map((obj) => (
-              <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
             ))}
           </div>
         </TabPanel>
@@ -83,7 +85,7 @@ const PlaceList: NextPage<Props> = (props) => {
             {currPlaces?.filter((obj) => {
               return obj.category == "FOOD"
             }).map((obj) => (
-              <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
             ))}
           </div>
         </TabPanel>
@@ -92,7 +94,7 @@ const PlaceList: NextPage<Props> = (props) => {
             {currPlaces?.filter((obj) => {
               return obj.category == "ACTIVITIES"
             }).map((obj) => (
-              <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
             ))}
           </div>
         </TabPanel>
@@ -101,7 +103,7 @@ const PlaceList: NextPage<Props> = (props) => {
             {currPlaces?.filter((obj) => {
               return obj.category == "OTHERS"
             }).map((obj) => (
-              <PlaceCard key={obj.name} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
             ))}
           </div>
         </TabPanel>

@@ -9,6 +9,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     method,
   } = req
 
+  //TODO Verify User Session
+
   switch (method) {
     case 'GET':
       const getPlan = await prisma.plan.findUnique({

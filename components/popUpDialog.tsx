@@ -5,45 +5,43 @@ import { classNames } from 'primereact/utils';
 import { NextPage } from "next";
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Item } from '@prisma/client';
+import { Category, Item } from '@prisma/client';
+import { useRouter } from 'next/router';
 
 interface Props {
   display: boolean;
-  header: string,
+  header: Category,
   handlePopUp: (show: boolean) => void;
-  addNewPlace: (data: Item) => void;
 }
 
 const PopUpDialog: NextPage<Props> = (props) => {
-  const { display, header, handlePopUp, addNewPlace } = props;
+  const { display, header, handlePopUp } = props;
 
   const defaultValues = {
-    place: '',
-    description: ''
+    name: '',
+    notes: ''
   }
+
+  const router = useRouter()
+  const { id } = router.query
 
   const { control, formState: { errors }, handleSubmit } = useForm({ defaultValues });
 
-  const onSubmit = (data: { place: string; description: string; }) => {
-    let category = "";
-    switch (header) {
-      case "Sightseeing":
-        category = "SIGHTSEEING";
-        break;
-      case "Food":
-        category = "FOOD";
-        break;
-      case "Activities":
-        category = "ACTIVITIES";
-        break;
-      case "Others":
-        category = "OTHERS";
-        break;
-      default:
-        break;
-    }
-    addNewPlace({ name: data.place, notes: data.description, category: category });
-    hidePopUp();
+  const onSubmit = (data: { name: string; notes: string; }) => {
+    let category: Category = header;
+
+    fetch('/api/item', {
+      body: JSON.stringify({ planId: id, name: data.name, notes: data.notes, category: category }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    }).then((res) => {
+      return res.json() as Promise<Item>
+    }).then((data) => {
+      console.log(data);
+      hidePopUp();
+    })
   };
 
   const renderFooter = () => {
@@ -68,17 +66,17 @@ const PopUpDialog: NextPage<Props> = (props) => {
       <div className="grid p-fluid">
         <div className="field py-3">
           <span className="p-float-label">
-            <Controller name="place" control={control} rules={{ required: 'Place is required.' }} render={({ field, fieldState }) => (
+            <Controller name="name" control={control} rules={{ required: 'Place is required.' }} render={({ field, fieldState }) => (
               <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
             )} />
-            <label htmlFor="place" className={classNames({ 'p-error': errors.place })}>Place*</label>
+            <label htmlFor="place" className={classNames({ 'p-error': errors.name })}>Place*</label>
           </span>
           {/* {getFormErrorMessage('name')} */}
         </div>
 
         <div className="field py-3">
           <span className="p-float-label">
-            <Controller name="description" control={control} render={({ field }) => (
+            <Controller name="notes" control={control} render={({ field }) => (
               <InputText id={field.name} {...field} autoFocus />
             )} />
             <label htmlFor="description">Description</label>

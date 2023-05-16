@@ -1,6 +1,8 @@
 import { useSession } from 'next-auth/react'
 import PlaceList from '../../components/placeList'
-import TimeLine from '../../components/timeline'
+
+import dayjs from 'dayjs'
+import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -10,6 +12,9 @@ import { Prisma } from '@prisma/client';
 import useSWR from 'swr'
 import { useRouter } from 'next/router'
 import fetcher from '../../lib/fetcher'
+import { useMemo } from 'react'
+
+import temData from '../../components/temporaryData'
 
 const planWithItems = Prisma.validator<Prisma.PlanArgs>()({
   include: { Items: true },
@@ -17,24 +22,25 @@ const planWithItems = Prisma.validator<Prisma.PlanArgs>()({
 
 type PlanWithItems = Prisma.PlanGetPayload<typeof planWithItems>
 
+const djLocalizer = dayjsLocalizer(dayjs)
+
 const PlanPage = () => {
   const { data: session } = useSession()
 
   const router = useRouter()
   const { id } = router.query
 
+  const { defaultDate, max } = useMemo(
+    () => ({
+      defaultDate: new Date(2015, 3, 1),
+      max: dayjs().endOf('day').subtract(1, 'hours').toDate(),
+    }),
+    []
+  )
+
   const { data, error } = useSWR<PlanWithItems>(id ? `/api/plan/${id}` : null, fetcher)
-
-  if (error) return <div>An error occured.</div>
+  if (error) return <div>An error occured. {error.message}</div>
   if (!data) return <div>Loading ...</div>
-
-  var tem = new Array();
-  var startDate = new Date(data.startDate);
-  // var endDate = new Date(plan!.endDate);
-  // while (startDate <= endDate) {
-  //   tem.push(new Date(startDate));
-  //   startDate.setDate(startDate.getDate() + 1);
-  // }
 
   return (
     <main>
@@ -45,11 +51,23 @@ const PlanPage = () => {
               <Button icon="pi pi-home" rounded onClick={() => { window.location.href = "/"; }} />
               <div className="font-medium text-2xl pl-4">{data.title}</div>
             </div>
-            <div>
-              <TimeLine dates={tem}></TimeLine>
+            <div style={{ height: "700px" }}>
+              <Calendar
+                defaultDate={dayjs().toDate()}
+                events={temData}
+                localizer={djLocalizer}
+                step={60}
+                views={{
+                  month: true,
+                  week: true,
+                  agenda: true
+                }} />
             </div>
-            <div style={{ boxShadow: "0 -5px 5px -5px #333", position: "sticky", bottom: "0", backgroundColor: "white" }}>
-              <PlaceList places={data.Items}></PlaceList>
+            <div className="container absolute bottom-0">
+              <div className="" style={{ boxShadow: "0 -5px 5px -5px #333", backgroundColor: "white" }}>
+                {/* <PlaceList places={data.Items}></PlaceList> */}
+                <PlaceList></PlaceList>
+              </div>
             </div>
           </DndProvider>
         ) : (

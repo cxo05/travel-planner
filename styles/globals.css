@@ -35,23 +35,3 @@ a {
   border-radius: 12px;
   box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
 }
-
-#custom thead {
-  display: none;
-}
-
-table {
-  height: 1px;
-}
-
-tr {
-  height: 100%;
-}
-
-td {
-  height: 100%;
-}
-
-td>div {
-  height: 100%;
-}

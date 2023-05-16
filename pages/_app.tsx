@@ -9,6 +9,8 @@ import "primeicons/primeicons.css";
 
 import '../styles/globals.css'
 
+import '../styles/calendar.css'
+
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
     <SessionProvider session={session}>

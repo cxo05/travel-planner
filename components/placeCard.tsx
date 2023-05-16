@@ -3,10 +3,12 @@ import { NextPage } from "next";
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button'
 import { DragPreviewImage, useDrag } from "react-dnd";
+import { Item } from "@prisma/client";
 
 interface Props {
-  name: string;
-  notes: string | null;
+  id: number
+  name: string
+  notes: string | null
 }
 
 export const ItemTypes = {
@@ -14,15 +16,23 @@ export const ItemTypes = {
 }
 
 const PlaceCard: NextPage<Props> = (props) => {
-  const { name, notes } = props;
+  const { id, name, notes } = props;
 
   const footer = <div>
     {/* <Button label="Edit" className="p-button-sm mr-1" /> */}
   </div>
 
+  async function handleDeleteItem() {
+    fetch(`/api/item/${id}`, {
+      method: 'DELETE'
+    }).then((res) => {
+      return res.json() as Promise<Item>
+    })
+  }
+
   const title = <div className='flex justify-between'>
     <p>{name}</p>
-    <Button icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" aria-label="Cancel" />
+    <Button icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" aria-label="Cancel" onClick={handleDeleteItem} />
   </div>
 
   const [{ isDragging }, drag] = useDrag(() => ({

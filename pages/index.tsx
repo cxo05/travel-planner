@@ -16,7 +16,7 @@ const Home: NextPage<Plans> = ({ plans }) => {
 
   async function handleNewPlan() {
     setLoading(true)
-    fetch('api/plan', {
+    fetch('/api/plan', {
       body: JSON.stringify({ title: 'New Plan', userId: session?.user.id }),
       headers: {
         'Content-Type': 'application/json'
@@ -25,7 +25,6 @@ const Home: NextPage<Plans> = ({ plans }) => {
     }).then((res) => {
       return res.json() as Promise<Plan>
     }).then((data) => {
-      console.log(data);
       viewPlan(data.id)
     })
   }
