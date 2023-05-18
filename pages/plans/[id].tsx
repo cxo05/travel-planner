@@ -2,19 +2,20 @@ import { useSession } from 'next-auth/react'
 import PlaceList from '../../components/placeList'
 
 import dayjs from 'dayjs'
-import { Calendar, dayjsLocalizer } from 'react-big-calendar'
+import { Calendar, View, Views, dayjsLocalizer } from 'react-big-calendar'
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { Button } from 'primereact/button'
 
-import { Prisma } from '@prisma/client';
+import { Item, Prisma } from '@prisma/client';
 import useSWR from 'swr'
 import { useRouter } from 'next/router'
 import fetcher from '../../lib/fetcher'
-import { useMemo } from 'react'
 
 import temData from '../../components/temporaryData'
+import { useMemo } from 'react'
 
 const planWithItems = Prisma.validator<Prisma.PlanArgs>()({
   include: { Items: true },
@@ -30,10 +31,9 @@ const PlanPage = () => {
   const router = useRouter()
   const { id } = router.query
 
-  const { defaultDate, max } = useMemo(
+  const { defaultView } = useMemo(
     () => ({
-      defaultDate: new Date(2015, 3, 1),
-      max: dayjs().endOf('day').subtract(1, 'hours').toDate(),
+      defaultView: Views.WEEK,
     }),
     []
   )
@@ -41,6 +41,8 @@ const PlanPage = () => {
   const { data, error } = useSWR<PlanWithItems>(id ? `/api/plan/${id}` : null, fetcher)
   if (error) return <div>An error occured. {error.message}</div>
   if (!data) return <div>Loading ...</div>
+
+  const DnDCalendar = withDragAndDrop(Calendar)
 
   return (
     <main>
@@ -52,7 +54,7 @@ const PlanPage = () => {
               <div className="font-medium text-2xl pl-4">{data.title}</div>
             </div>
             <div style={{ height: "700px" }}>
-              <Calendar
+              <DnDCalendar
                 defaultDate={dayjs().toDate()}
                 events={temData}
                 localizer={djLocalizer}
@@ -61,7 +63,11 @@ const PlanPage = () => {
                   month: true,
                   week: true,
                   agenda: true
-                }} />
+                }}
+                defaultView={defaultView}
+                draggableAccessor={(event) => true}
+                dayLayoutAlgorithm={'no-overlap'}
+              />
             </div>
             <div className="container absolute bottom-0">
               <div className="" style={{ boxShadow: "0 -5px 5px -5px #333", backgroundColor: "white" }}>

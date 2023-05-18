@@ -6,32 +6,32 @@ import { NextPage } from "next";
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Category, Item } from '@prisma/client';
-import { useRouter } from 'next/router';
+import { useSWRConfig } from 'swr';
 
 interface Props {
-  display: boolean;
-  header: Category,
-  handlePopUp: (show: boolean) => void;
+  planId: string | string[] | undefined
+  display: boolean
+  header: Category
+  handlePopUp: (show: boolean) => void
 }
 
-const PopUpDialog: NextPage<Props> = (props) => {
-  const { display, header, handlePopUp } = props;
+const CreateItemDialog: NextPage<Props> = (props) => {
+  const { planId, display, header, handlePopUp } = props;
 
   const defaultValues = {
     name: '',
     notes: ''
   }
 
-  const router = useRouter()
-  const { id } = router.query
-
   const { control, formState: { errors }, handleSubmit } = useForm({ defaultValues });
+
+  const { mutate } = useSWRConfig()
 
   const onSubmit = (data: { name: string; notes: string; }) => {
     let category: Category = header;
 
-    fetch('/api/item', {
-      body: JSON.stringify({ planId: id, name: data.name, notes: data.notes, category: category }),
+    fetch('/api/item?planId=' + planId, {
+      body: JSON.stringify({ name: data.name, notes: data.notes, category: category }),
       headers: {
         'Content-Type': 'application/json'
       },
@@ -39,7 +39,7 @@ const PopUpDialog: NextPage<Props> = (props) => {
     }).then((res) => {
       return res.json() as Promise<Item>
     }).then((data) => {
-      console.log(data);
+      mutate(`/api/item?planId=${planId}`)
       hidePopUp();
     })
   };
@@ -87,4 +87,4 @@ const PopUpDialog: NextPage<Props> = (props) => {
   )
 };
 
-export default PopUpDialog;
+export default CreateItemDialog;

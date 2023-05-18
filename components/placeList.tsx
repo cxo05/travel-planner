@@ -1,23 +1,15 @@
 import PlaceCard from './placeCard';
-import { NextPage } from 'next';
+import CreateItemDialog from './createItemDialog';
 
 import { TabView, TabPanel } from 'primereact/tabview';
 import { SelectButton } from 'primereact/selectbutton';
 import { useState } from 'react';
 import { Button } from 'primereact/button';
-import PopUpDialog from './popUpDialog';
-import { Category, Item } from '@prisma/client';
-import useSWR from 'swr';
+import { Category } from '@prisma/client';
 import { useRouter } from 'next/router';
-import fetcher from '../lib/fetcher'
+import { useItems } from '../lib/swr'
 
-// interface Props {
-//   places: Item[];
-// }
-
-//const PlaceList: NextPage<Props> = (props) => {
 const PlaceList = () => {
-  //const { places } = props;
   const router = useRouter()
   const { id } = router.query
 
@@ -25,13 +17,10 @@ const PlaceList = () => {
   const [display, setDisplay] = useState(false);
   const [displayHeader, setDisplayHeader] = useState<Category>('SIGHTSEEING');
 
-  const { data, error } = useSWR<Item[], Error>(`/api/item?planId=${id}`, fetcher)
-  if (error) return <div>An error occured. {error.message}</div>
-  if (!data) return <div>Loading ...</div>
+  const { items, isLoading, isError } = useItems(id)
 
-  console.log(data);
-
-  let currPlaces = data;
+  if (isLoading) return <div>Loading ...</div>
+  if (isError) return <div>An error occured</div>
 
   const options = [
     { label: 'Sightseeing', value: 0 },
@@ -63,7 +52,7 @@ const PlaceList = () => {
   return (
     <div className='pt-4 select-none'>
       <div className="flex items-center justify-center mx-5">
-        <PopUpDialog display={display} header={displayHeader} handlePopUp={handlePopUp}></PopUpDialog>
+        <CreateItemDialog planId={id} display={display} header={displayHeader} handlePopUp={handlePopUp}></CreateItemDialog>
         <p className='text-lg font-bold'>Places</p>
         <div className='flex-grow'></div>
         <SelectButton value={activeIndex} options={options} unselectable={false} onChange={(e) => setActiveIndex(e.value)}></SelectButton>
@@ -73,37 +62,37 @@ const PlaceList = () => {
       <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
         <TabPanel header="Sightseeing">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces?.filter((obj) => {
+            {items != undefined && items?.filter((obj) => {
               return obj.category == "SIGHTSEEING"
             }).map((obj) => (
-              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj}></PlaceCard>
             ))}
           </div>
         </TabPanel>
         <TabPanel header="Food">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces?.filter((obj) => {
+            {items != undefined && items?.filter((obj) => {
               return obj.category == "FOOD"
             }).map((obj) => (
-              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj}></PlaceCard>
             ))}
           </div>
         </TabPanel>
         <TabPanel header="Activities">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces?.filter((obj) => {
+            {items != undefined && items?.filter((obj) => {
               return obj.category == "ACTIVITIES"
             }).map((obj) => (
-              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj}></PlaceCard>
             ))}
           </div>
         </TabPanel>
         <TabPanel header="Others">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces?.filter((obj) => {
+            {items != undefined && items?.filter((obj) => {
               return obj.category == "OTHERS"
             }).map((obj) => (
-              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj}></PlaceCard>
             ))}
           </div>
         </TabPanel>
