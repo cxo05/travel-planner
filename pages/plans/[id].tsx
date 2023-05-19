@@ -2,26 +2,18 @@ import { useSession } from 'next-auth/react'
 import PlaceList from '../../components/placeList'
 
 import dayjs from 'dayjs'
-import { Calendar, View, Views, dayjsLocalizer } from 'react-big-calendar'
+import { Calendar, Views, dayjsLocalizer } from 'react-big-calendar'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { Button } from 'primereact/button'
 
-import { Item, Prisma } from '@prisma/client';
-import useSWR from 'swr'
 import { useRouter } from 'next/router'
-import fetcher from '../../lib/fetcher'
 
 import temData from '../../components/temporaryData'
 import { useMemo } from 'react'
-
-const planWithItems = Prisma.validator<Prisma.PlanArgs>()({
-  include: { Items: true },
-})
-
-type PlanWithItems = Prisma.PlanGetPayload<typeof planWithItems>
+import { usePlan } from '../../lib/swr'
 
 const djLocalizer = dayjsLocalizer(dayjs)
 
@@ -38,9 +30,10 @@ const PlanPage = () => {
     []
   )
 
-  const { data, error } = useSWR<PlanWithItems>(id ? `/api/plan/${id}` : null, fetcher)
-  if (error) return <div>An error occured. {error.message}</div>
-  if (!data) return <div>Loading ...</div>
+  const { plan, isLoading, isError } = usePlan(id)
+
+  if (isLoading) return <div>Loading ...</div>
+  if (isError) return <div>An error occured</div>
 
   const DnDCalendar = withDragAndDrop(Calendar)
 
@@ -51,7 +44,7 @@ const PlanPage = () => {
           <DndProvider backend={HTML5Backend}>
             <div className='inline-flex'>
               <Button icon="pi pi-home" rounded onClick={() => { window.location.href = "/"; }} />
-              <div className="font-medium text-2xl pl-4">{data.title}</div>
+              <div className="font-medium text-2xl pl-4">{plan?.title}</div>
             </div>
             <div style={{ height: "700px" }}>
               <DnDCalendar
@@ -71,7 +64,6 @@ const PlanPage = () => {
             </div>
             <div className="container absolute bottom-0">
               <div className="" style={{ boxShadow: "0 -5px 5px -5px #333", backgroundColor: "white" }}>
-                {/* <PlaceList places={data.Items}></PlaceList> */}
                 <PlaceList></PlaceList>
               </div>
             </div>

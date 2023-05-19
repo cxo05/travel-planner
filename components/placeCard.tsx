@@ -8,10 +8,7 @@ import { mutate } from "swr";
 
 interface Props {
   item: Item
-  // planId: string
-  // id: number
-  // name: string
-  // notes: string | null
+  handleEdit: (item: Item) => void
 }
 
 export const ItemTypes = {
@@ -19,10 +16,10 @@ export const ItemTypes = {
 }
 
 const PlaceCard: NextPage<Props> = (props) => {
-  const { item } = props;
+  const { item, handleEdit } = props;
 
   const footer = <div>
-    {/* <Button label="Edit" className="p-button-sm mr-1" /> */}
+    <Button label="Edit" className="p-button-sm mr-1" onClick={() => handleEdit(item)} />
   </div>
 
   async function handleDeleteItem() {
