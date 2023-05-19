@@ -3,66 +3,67 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 import { NextPage } from "next";
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Category, Item } from '@prisma/client';
-import { useRouter } from 'next/router';
+import { useSWRConfig } from 'swr';
 
 interface Props {
-  display: boolean;
-  header: Category,
-  handlePopUp: (show: boolean) => void;
+  planId: string | string[] | undefined
+  item: Item | undefined
+  visible: boolean
+  category: Category
+  onHide: () => void
 }
 
-const PopUpDialog: NextPage<Props> = (props) => {
-  const { display, header, handlePopUp } = props;
+const defaultValues = {
+  name: '',
+  notes: ''
+}
 
-  const defaultValues = {
-    name: '',
-    notes: ''
-  }
+const AddEditItemDialog: NextPage<Props> = (props) => {
+  const { planId, item, visible, category, onHide } = props;
 
-  const router = useRouter()
-  const { id } = router.query
+  const { control, formState: { errors }, handleSubmit, reset } = useForm<Item>({ defaultValues });
 
-  const { control, formState: { errors }, handleSubmit } = useForm({ defaultValues });
+  // Feels a bit hacky, probably a better way to do this
+  useEffect(() => {
+    if (item) {
+      reset(item);
+    } else {
+      reset(defaultValues);
+    }
+  }, [item, reset]);
 
-  const onSubmit = (data: { name: string; notes: string; }) => {
-    let category: Category = header;
+  const { mutate } = useSWRConfig()
 
-    fetch('/api/item', {
-      body: JSON.stringify({ planId: id, name: data.name, notes: data.notes, category: category }),
+  const onSubmit = (newItem: Item) => {
+    fetch(item ? `/api/item/${item.id}` : `/api/item?planId=${planId}`, {
+      body: JSON.stringify({ name: newItem.name, notes: newItem.notes, category: category }),
       headers: {
         'Content-Type': 'application/json'
       },
-      method: 'POST'
+      method: item ? 'PUT' : 'POST'
     }).then((res) => {
+      console.log(res);
       return res.json() as Promise<Item>
     }).then((data) => {
-      console.log(data);
-      hidePopUp();
+      mutate(`/api/item?planId=${planId}`)
+      onHide();
     })
   };
 
   const renderFooter = () => {
     return (
       <div>
-        <Button label="Cancel" icon="pi pi-times" onClick={hidePopUp} className="p-button-text" />
+        <Button label="Cancel" icon="pi pi-times" onClick={onHide} className="p-button-text" />
         <Button label="Confirm" icon="pi pi-check" onClick={handleSubmit(onSubmit)} autoFocus />
       </div>
     );
   }
 
-  //   const getFormErrorMessage = (name) => {
-  //     return errors[name] && <small className="p-error">{errors[name].message}</small>
-  // };
-
-  const hidePopUp = () => {
-    handlePopUp(false);
-  }
-
   return (
-    <Dialog header={header} visible={display} style={{ width: '50vw' }} footer={renderFooter} onHide={hidePopUp}>
+    <Dialog header={category} visible={visible} style={{ width: '50vw' }} footer={renderFooter} onHide={() => { onHide() }}>
       <div className="grid p-fluid">
         <div className="field py-3">
           <span className="p-float-label">
@@ -71,7 +72,6 @@ const PopUpDialog: NextPage<Props> = (props) => {
             )} />
             <label htmlFor="place" className={classNames({ 'p-error': errors.name })}>Place*</label>
           </span>
-          {/* {getFormErrorMessage('name')} */}
         </div>
 
         <div className="field py-3">
@@ -87,4 +87,4 @@ const PopUpDialog: NextPage<Props> = (props) => {
   )
 };
 
-export default PopUpDialog;
+export default AddEditItemDialog;

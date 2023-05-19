@@ -1,37 +1,28 @@
 import PlaceCard from './placeCard';
-import { NextPage } from 'next';
+import AddEditItemDialog from './addEditItemDialog';
 
 import { TabView, TabPanel } from 'primereact/tabview';
 import { SelectButton } from 'primereact/selectbutton';
 import { useState } from 'react';
 import { Button } from 'primereact/button';
-import PopUpDialog from './popUpDialog';
 import { Category, Item } from '@prisma/client';
-import useSWR from 'swr';
 import { useRouter } from 'next/router';
-import fetcher from '../lib/fetcher'
+import { useItems } from '../lib/swr'
 
-// interface Props {
-//   places: Item[];
-// }
-
-//const PlaceList: NextPage<Props> = (props) => {
 const PlaceList = () => {
-  //const { places } = props;
   const router = useRouter()
   const { id } = router.query
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [display, setDisplay] = useState(false);
+  const [visiblePopUp, setVisiblePopUp] = useState(false);
   const [displayHeader, setDisplayHeader] = useState<Category>('SIGHTSEEING');
 
-  const { data, error } = useSWR<Item[], Error>(`/api/item?planId=${id}`, fetcher)
-  if (error) return <div>An error occured. {error.message}</div>
-  if (!data) return <div>Loading ...</div>
+  const [editItem, setEditItem] = useState<Item | undefined>(undefined);
 
-  console.log(data);
+  const { items, isLoading, isError } = useItems(id)
 
-  let currPlaces = data;
+  if (isLoading) return <div>Loading ...</div>
+  if (isError) return <div>An error occured</div>
 
   const options = [
     { label: 'Sightseeing', value: 0 },
@@ -40,7 +31,7 @@ const PlaceList = () => {
     { label: 'Others', value: 3 },
   ];
 
-  const handlePopUp = (show: boolean) => {
+  const handleAddPopUp = () => {
     let category: Category = 'SIGHTSEEING';
     switch (activeIndex) {
       case 0:
@@ -56,54 +47,60 @@ const PlaceList = () => {
         category = "OTHERS";
         break;
     }
+    setEditItem(undefined);
     setDisplayHeader(category);
-    setDisplay(show);
+    setVisiblePopUp(true);
+  }
+
+  const handleEditPopUp = (item: Item) => {
+    setEditItem(item);
+    setVisiblePopUp(true);
   }
 
   return (
     <div className='pt-4 select-none'>
+      <AddEditItemDialog planId={id} item={editItem} visible={visiblePopUp} category={displayHeader} onHide={() => setVisiblePopUp(false)}></AddEditItemDialog>
       <div className="flex items-center justify-center mx-5">
-        <PopUpDialog display={display} header={displayHeader} handlePopUp={handlePopUp}></PopUpDialog>
         <p className='text-lg font-bold'>Places</p>
         <div className='flex-grow'></div>
         <SelectButton value={activeIndex} options={options} unselectable={false} onChange={(e) => setActiveIndex(e.value)}></SelectButton>
         <div className='flex-grow'></div>
-        <Button icon="pi pi-plus" className="p-button-rounded" onClick={() => handlePopUp(true)}></Button>
+        <Button icon="pi pi-plus" className="p-button-rounded" onClick={() => handleAddPopUp()}></Button>
       </div>
       <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
         <TabPanel header="Sightseeing">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces?.filter((obj) => {
+            {items != undefined && items?.filter((obj) => {
               return obj.category == "SIGHTSEEING"
             }).map((obj) => (
-              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp}></PlaceCard>
             ))}
           </div>
         </TabPanel>
         <TabPanel header="Food">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces?.filter((obj) => {
+            {items != undefined && items?.filter((obj) => {
               return obj.category == "FOOD"
             }).map((obj) => (
-              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp}></PlaceCard>
             ))}
           </div>
         </TabPanel>
         <TabPanel header="Activities">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces?.filter((obj) => {
+            {items != undefined && items?.filter((obj) => {
               return obj.category == "ACTIVITIES"
             }).map((obj) => (
-              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp}></PlaceCard>
             ))}
           </div>
         </TabPanel>
         <TabPanel header="Others">
           <div className="grid grid-cols-4 gap-4">
-            {currPlaces?.filter((obj) => {
+            {items != undefined && items?.filter((obj) => {
               return obj.category == "OTHERS"
             }).map((obj) => (
-              <PlaceCard key={obj.id} id={obj.id} name={obj.name} notes={obj.notes}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp}></PlaceCard>
             ))}
           </div>
         </TabPanel>
