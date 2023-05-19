@@ -8,6 +8,10 @@ Using supabase for postgresql database hosting.
 
 - [Node.js](https://nodejs.org/en/)
 
+## Design
+
+Currently using Figma for design documents and architecture diagram [here](https://www.figma.com/file/NgzQ2JTh6JCDEbreHfhXjl/Travel-Planner?type=design&node-id=0%3A1&t=IEqm8urpnaggiFie-1)
+
 ## Development
 
 Add .env file to root directory with database url and change the password placeholder
