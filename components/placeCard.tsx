@@ -5,10 +5,13 @@ import { Button } from 'primereact/button'
 import { DragPreviewImage, useDrag } from "react-dnd";
 import { Item } from "@prisma/client";
 import { mutate } from "swr";
+import { ScheduledItemsWithDetails } from "../lib/swr";
+import { CalendarEvent } from "../pages/plans/[id]";
 
 interface Props {
   item: Item
   handleEdit: (item: Item) => void
+  handleDragStart: (item: CalendarEvent) => void
 }
 
 export const ItemTypes = {
@@ -16,7 +19,7 @@ export const ItemTypes = {
 }
 
 const PlaceCard: NextPage<Props> = (props) => {
-  const { item, handleEdit } = props;
+  const { item, handleEdit, handleDragStart } = props;
 
   const footer = <div>
     <Button label="Edit" className="p-button-sm mr-1" onClick={() => handleEdit(item)} />
@@ -37,18 +40,30 @@ const PlaceCard: NextPage<Props> = (props) => {
     <Button icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" aria-label="Cancel" onClick={handleDeleteItem} />
   </div>
 
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: ItemTypes.PLACE,
-    item: item.name,
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }))
+  // const [{ isDragging }, drag] = useDrag(() => ({
+  //   type: ItemTypes.PLACE,
+  //   item: item.name,
+  //   collect: (monitor) => ({
+  //     isDragging: !!monitor.isDragging()
+  //   })
+  // }))
 
   return (
     <>
-      <div ref={drag}>
-        <Card title={title} footer={footer} style={{ opacity: isDragging ? 0.5 : 1 }}>
+      <div
+        //ref={drag}
+        draggable="true"
+        onDragStart={() => {
+          let scheduledItem: CalendarEvent = {
+            itemId: item.id,
+            title: item.name,
+            category: item.category
+          }
+          handleDragStart(scheduledItem)
+        }}
+      >
+        {/* <Card title={title} footer={footer} style={{ opacity: isDragging ? 0.5 : 1 }}> */}
+        <Card title={title} footer={footer}>
           <p >{item.notes}</p>
         </Card>
       </div>

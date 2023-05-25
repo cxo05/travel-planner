@@ -7,9 +7,16 @@ import { useState } from 'react';
 import { Button } from 'primereact/button';
 import { Category, Item } from '@prisma/client';
 import { useRouter } from 'next/router';
-import { useItems } from '../lib/swr'
+import { CalendarEvent, useItems } from '../lib/swr'
+import { NextPage } from 'next';
 
-const PlaceList = () => {
+interface Props {
+  handleDragStart: (item: CalendarEvent) => void
+}
+
+const PlaceList: NextPage<Props> = (props) => {
+  const { handleDragStart } = props;
+
   const router = useRouter()
   const { id } = router.query
 
@@ -73,7 +80,7 @@ const PlaceList = () => {
             {items != undefined && items?.filter((obj) => {
               return obj.category == "SIGHTSEEING"
             }).map((obj) => (
-              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
             ))}
           </div>
         </TabPanel>
@@ -82,7 +89,7 @@ const PlaceList = () => {
             {items != undefined && items?.filter((obj) => {
               return obj.category == "FOOD"
             }).map((obj) => (
-              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
             ))}
           </div>
         </TabPanel>
@@ -91,7 +98,7 @@ const PlaceList = () => {
             {items != undefined && items?.filter((obj) => {
               return obj.category == "ACTIVITIES"
             }).map((obj) => (
-              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
             ))}
           </div>
         </TabPanel>
@@ -100,7 +107,7 @@ const PlaceList = () => {
             {items != undefined && items?.filter((obj) => {
               return obj.category == "OTHERS"
             }).map((obj) => (
-              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp}></PlaceCard>
+              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
             ))}
           </div>
         </TabPanel>
