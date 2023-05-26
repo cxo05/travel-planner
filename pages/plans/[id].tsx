@@ -5,9 +5,6 @@ import dayjs from 'dayjs'
 import { Calendar, EventProps, Views, dayjsLocalizer } from 'react-big-calendar'
 import withDragAndDrop, { DragFromOutsideItemArgs, withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop'
 
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-
 import { useRouter } from 'next/router'
 
 import { useCallback, useMemo, useState } from 'react'
@@ -35,23 +32,14 @@ const PlanPage = () => {
   const { calendarEvents, isLoading: isLoadingItem, isError: isErrorItem } = useCalendarEvents(id)
 
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent>()
-  //const [displayDragItemInCell, setDisplayDragItemInCell] = useState(true)
+  const dragFromOutsideItem = useCallback(() => draggedEvent, [draggedEvent])
 
   const handleDragStart = useCallback((event: CalendarEvent) => {
-    console.log(event)
     setDraggedEvent(event)
   }, [])
 
-  //const dragFromOutsideItem = () => { return draggedEvent }
-
-  // const handleDisplayDragItemInCell = useCallback(
-  //   () => setDisplayDragItemInCell((prev) => !prev),
-  //   []
-  // )
-
   const onEventDrop: withDragAndDropProps<CalendarEvent>['onEventDrop'] =
     ({ event, start, end }) => {
-      console.log("Moving scheduled Event");
       fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
         body: JSON.stringify({ startDate: start, endDate: end }),
         headers: {
@@ -59,7 +47,6 @@ const PlanPage = () => {
         },
         method: 'PUT'
       }).then((res) => {
-        console.log(res);
         return res.json() as Promise<ScheduledItem>
       }).then((data) => {
         mutate(`/api/scheduledItem?planId=${id}`)
@@ -68,7 +55,6 @@ const PlanPage = () => {
 
   const onEventResize: withDragAndDropProps<CalendarEvent>['onEventResize'] =
     ({ event, start, end }) => {
-      console.log("Resizing scheduled Event");
       fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
         body: JSON.stringify({ startDate: start, endDate: end }),
         headers: {
@@ -76,7 +62,6 @@ const PlanPage = () => {
         },
         method: 'PUT'
       }).then((res) => {
-        console.log(res);
         return res.json() as Promise<ScheduledItem>
       }).then((data) => {
         mutate(`/api/scheduledItem?planId=${id}`)
@@ -85,9 +70,6 @@ const PlanPage = () => {
 
   const onDropFromOutside = useCallback(
     ({ start, end, allDay: isAllDay }: DragFromOutsideItemArgs) => {
-      console.log("onDropFromOutside");
-      console.log(draggedEvent);
-
       fetch(`/api/scheduledItem?planId=${id}`, {
         body: JSON.stringify({ itemId: draggedEvent?.itemId, startDate: start, endDate: end }),
         headers: {
@@ -98,7 +80,6 @@ const PlanPage = () => {
         setDraggedEvent(undefined)
         return res.json() as Promise<ScheduledItem>
       }).then((data) => {
-        console.log(data)
         mutate(`/api/scheduledItem?planId=${id}`)
       })
     },
@@ -153,7 +134,7 @@ const PlanPage = () => {
     <main style={{ height: `calc(800px + ${placeListHeight})` }}>
       <div className='h-full'>
         {session && session.user ? (
-          <DndProvider backend={HTML5Backend}>
+          <>
             <div style={{ height: "800px" }}>
               <DnDCalendar
                 defaultDate={dayjs().toDate()}
@@ -171,23 +152,26 @@ const PlanPage = () => {
                   event: EventComponent,
                 }}
                 eventPropGetter={eventPropGetter}
-                // dragFromOutsideItem={
-                //   displayDragItemInCell ? dragFromOutsideItem : undefined
-                // }
+                //@ts-ignore
+                dragFromOutsideItem={dragFromOutsideItem}
                 onDropFromOutside={onDropFromOutside}
-                //onDragOver={customOnDragOver}
                 onEventDrop={onEventDrop}
                 onEventResize={onEventResize}
                 handleDragStart={handleDragStart}
                 resizable
               />
             </div>
-            <div className="container fixed bottom-0" style={{ height: `${placeListHeight}` }}>
+            <div
+              className="container fixed bottom-0"
+              style={{ height: `${placeListHeight}` }}
+              onDragOver={(e) => { e.stopPropagation() }}
+              onDrop={(e) => { e.stopPropagation() }}
+            >
               <div className="" style={{ boxShadow: "0 -5px 5px -5px #333", backgroundColor: "white" }}>
                 <PlaceList handleDragStart={handleDragStart}></PlaceList>
               </div>
             </div>
-          </DndProvider>
+          </>
         ) : (
           <p>You need to sign in to save your progress</p>
         )}
