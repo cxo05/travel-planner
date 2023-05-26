@@ -2,20 +2,14 @@
 import { NextPage } from "next";
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button'
-import { DragPreviewImage, useDrag } from "react-dnd";
 import { Item } from "@prisma/client";
 import { mutate } from "swr";
-import { ScheduledItemsWithDetails } from "../lib/swr";
-import { CalendarEvent } from "../pages/plans/[id]";
+import { CalendarEvent } from "../lib/swr";
 
 interface Props {
   item: Item
   handleEdit: (item: Item) => void
   handleDragStart: (item: CalendarEvent) => void
-}
-
-export const ItemTypes = {
-  PLACE: 'place'
 }
 
 const PlaceCard: NextPage<Props> = (props) => {
@@ -40,18 +34,9 @@ const PlaceCard: NextPage<Props> = (props) => {
     <Button icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" aria-label="Cancel" onClick={handleDeleteItem} />
   </div>
 
-  // const [{ isDragging }, drag] = useDrag(() => ({
-  //   type: ItemTypes.PLACE,
-  //   item: item.name,
-  //   collect: (monitor) => ({
-  //     isDragging: !!monitor.isDragging()
-  //   })
-  // }))
-
   return (
     <>
       <div
-        //ref={drag}
         draggable="true"
         onDragStart={() => {
           let scheduledItem: CalendarEvent = {

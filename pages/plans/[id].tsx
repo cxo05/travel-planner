@@ -2,18 +2,17 @@ import { useSession } from 'next-auth/react'
 import PlaceList from '../../components/placeList'
 
 import dayjs from 'dayjs'
-import { Calendar, Views, dayjsLocalizer } from 'react-big-calendar'
+import { Calendar, EventProps, Views, dayjsLocalizer } from 'react-big-calendar'
 import withDragAndDrop, { DragFromOutsideItemArgs, withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop'
 
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { Button } from 'primereact/button'
 
 import { useRouter } from 'next/router'
 
 import { useCallback, useMemo, useState } from 'react'
 import { usePlan, useCalendarEvents, CalendarEvent } from '../../lib/swr'
-import { ScheduledItem } from '@prisma/client'
+import { Category, ScheduledItem } from '@prisma/client'
 import { mutate } from 'swr'
 
 const djLocalizer = dayjsLocalizer(dayjs)
@@ -31,7 +30,7 @@ const PlanPage = () => {
     []
   )
 
-  const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
+  // const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
 
   const { calendarEvents, isLoading: isLoadingItem, isError: isErrorItem } = useCalendarEvents(id)
 
@@ -106,21 +105,56 @@ const PlanPage = () => {
     [draggedEvent, setDraggedEvent, id]
   )
 
-  if (isLoadingPlan || isLoadingItem) return <div>Loading ...</div>
-  if (isErrorPlan || isErrorItem) return <div>An error occured</div>
+  const EventComponent = ({ event }: EventProps<CalendarEvent>) => {
+    let icon;
+    switch (event.category) {
+      case Category.SIGHTSEEING:
+        icon =
+          <span className="material-symbols-outlined px-1">
+            landscape
+          </span>
+        break;
+      case Category.ACTIVITIES:
+        // Maybe an icon
+        break;
+      case Category.FOOD:
+        icon =
+          <span className="material-symbols-outlined px-1">
+            restaurant
+          </span>
+        break;
+    }
+
+    return (
+      <div className='h-full flex flex-col items-center justify-center'>
+        {icon}
+        <span>{event.title}</span>
+      </div>
+    )
+  }
+
+  const eventPropGetter = (event: CalendarEvent) => ({
+    ...(event.category == Category.FOOD && {
+      className: 'bg-teal-400',
+    }),
+    ...(event.category == Category.SIGHTSEEING && {
+      className: 'bg-lime-500',
+    }),
+  })
+
+  if (isLoadingItem) return <div>Loading ...</div>
+  if (isErrorItem) return <div>An error occured</div>
 
   const DnDCalendar = withDragAndDrop<CalendarEvent>(Calendar)
 
+  const placeListHeight = '275px'
+
   return (
-    <main>
-      <div>
+    <main style={{ height: `calc(800px + ${placeListHeight})` }}>
+      <div className='h-full'>
         {session && session.user ? (
           <DndProvider backend={HTML5Backend}>
-            <div className='inline-flex'>
-              <Button icon="pi pi-home" rounded onClick={() => { window.location.href = "/"; }} />
-              <div className="font-medium text-2xl pl-4">{plan?.title}</div>
-            </div>
-            <div style={{ height: "700px" }}>
+            <div style={{ height: "800px" }}>
               <DnDCalendar
                 defaultDate={dayjs().toDate()}
                 events={calendarEvents}
@@ -133,6 +167,10 @@ const PlanPage = () => {
                 }}
                 defaultView={defaultView}
                 dayLayoutAlgorithm={'no-overlap'}
+                components={{
+                  event: EventComponent,
+                }}
+                eventPropGetter={eventPropGetter}
                 // dragFromOutsideItem={
                 //   displayDragItemInCell ? dragFromOutsideItem : undefined
                 // }
@@ -144,7 +182,7 @@ const PlanPage = () => {
                 resizable
               />
             </div>
-            <div className="container absolute bottom-0">
+            <div className="container fixed bottom-0" style={{ height: `${placeListHeight}` }}>
               <div className="" style={{ boxShadow: "0 -5px 5px -5px #333", backgroundColor: "white" }}>
                 <PlaceList handleDragStart={handleDragStart}></PlaceList>
               </div>
