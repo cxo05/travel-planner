@@ -3,9 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../lib/prisma'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const query = req.query;
-  const { planId } = query;
-  
+  const { planId } = req.query;
+
   const { name, notes, category } = req.body;
 
   switch (req.method) {

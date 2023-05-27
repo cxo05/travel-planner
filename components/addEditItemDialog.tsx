@@ -45,7 +45,6 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
       },
       method: item ? 'PUT' : 'POST'
     }).then((res) => {
-      console.log(res);
       return res.json() as Promise<Item>
     }).then((data) => {
       mutate(`/api/item?planId=${planId}`)

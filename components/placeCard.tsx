@@ -1,22 +1,20 @@
-
 import { NextPage } from "next";
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button'
-import { DragPreviewImage, useDrag } from "react-dnd";
-import { Item } from "@prisma/client";
+import { Category, Item } from "@prisma/client";
 import { mutate } from "swr";
+import { CalendarEvent } from "../lib/swr";
+import { DragEvent } from "react";
+import { createRoot } from 'react-dom/client';
 
 interface Props {
   item: Item
   handleEdit: (item: Item) => void
-}
-
-export const ItemTypes = {
-  PLACE: 'place'
+  handleDragStart: (item: CalendarEvent) => void
 }
 
 const PlaceCard: NextPage<Props> = (props) => {
-  const { item, handleEdit } = props;
+  const { item, handleEdit, handleDragStart } = props;
 
   const footer = <div>
     <Button label="Edit" className="p-button-sm mr-1" onClick={() => handleEdit(item)} />
@@ -37,18 +35,43 @@ const PlaceCard: NextPage<Props> = (props) => {
     <Button icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" aria-label="Cancel" onClick={handleDeleteItem} />
   </div>
 
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: ItemTypes.PLACE,
-    item: item.name,
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }))
-
   return (
     <>
-      <div ref={drag}>
-        <Card title={title} footer={footer} style={{ opacity: isDragging ? 0.5 : 1 }}>
+      <div
+        draggable="true"
+        onDragStart={(event: DragEvent) => {
+          let color = 'bg-lime-500'
+          switch (item.category) {
+            case Category.FOOD:
+              color = 'bg-teal-400'
+              break
+            case Category.SIGHTSEEING:
+              color = 'bg-lime-500'
+              break
+          }
+          let dragImage =
+            <div className={'rounded-md ' + color}>
+              <span className="p-2">{item.name}</span>
+            </div>
+
+          var ghost = document.createElement('div');
+          ghost.style.transform = "translate(-10000px, -10000px)";
+          ghost.style.position = "absolute";
+          document.body.appendChild(ghost);
+          event.dataTransfer.setDragImage(ghost, 0, 0);
+          const root = createRoot(ghost);
+
+          root.render(dragImage);
+          let scheduledItem: CalendarEvent = {
+            itemId: item.id,
+            title: item.name,
+            category: item.category
+          }
+          handleDragStart(scheduledItem)
+        }}
+      >
+        {/* <Card title={title} footer={footer} style={{ opacity: isDragging ? 0.5 : 1 }}> */}
+        <Card title={title} footer={footer}>
           <p >{item.notes}</p>
         </Card>
       </div>

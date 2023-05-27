@@ -4,7 +4,7 @@ import prisma from '../../../lib/prisma'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const itemId = req.query.id;
-  
+
   const { name, notes, category } = req.body
 
   switch (req.method) {
@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: {
           id: parseInt(String(itemId)),
         }
-      })      
+      })
       res.json(getItem)
       break
     case 'PUT':
