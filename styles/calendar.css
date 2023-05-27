@@ -812,7 +812,7 @@ button.rbc-input::-moz-focus-inner {
 
 .rbc-current-time-indicator {
   position: absolute;
-  z-index: 3;
+  /* z-index: 3; */
   left: 0;
   right: 0;
   height: 1px;
@@ -821,6 +821,3 @@ button.rbc-input::-moz-focus-inner {
 }
 
 /*# sourceMappingURL=react-big-calendar.css.map */
-
-/* Override React Big Calendar Styling */
-

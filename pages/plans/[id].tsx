@@ -86,29 +86,48 @@ const PlanPage = () => {
     [draggedEvent, setDraggedEvent, id]
   )
 
+  const deleteEvent = (event: CalendarEvent) => {
+    fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
+      method: 'DELETE'
+    }).then((res) => {
+      return res.json()
+    }).then((data) => {
+      mutate(`/api/scheduledItem?planId=${id}`)
+    })
+  }
+
   const EventComponent = ({ event }: EventProps<CalendarEvent>) => {
+    const [displayDelete, setDisplayDelete] = useState(false)
     let icon;
     switch (event.category) {
       case Category.SIGHTSEEING:
-        icon =
-          <span className="material-symbols-outlined px-1">
-            landscape
-          </span>
+        icon = 'landscape'
+        break;
+      case Category.FOOD:
+        icon = 'restaurant'
         break;
       case Category.ACTIVITIES:
         // Maybe an icon
         break;
-      case Category.FOOD:
-        icon =
-          <span className="material-symbols-outlined px-1">
-            restaurant
-          </span>
-        break;
     }
 
     return (
-      <div className='h-full flex flex-col items-center justify-center'>
-        {icon}
+      <div
+        className='h-full flex flex-col items-center justify-center'
+        onMouseEnter={() => setDisplayDelete(true)}
+        onMouseLeave={() => setDisplayDelete(false)}
+      >
+        {displayDelete &&
+          <div
+            className='absolute right-0 top-0 p-2'
+            onClick={() => deleteEvent(event)}
+          >
+            <i className="pi pi-times text-red-600 font-semibold"></i>
+          </div>
+        }
+        <span className="material-symbols-outlined px-1">
+          {icon}
+        </span>
         <span>{event.title}</span>
       </div>
     )
