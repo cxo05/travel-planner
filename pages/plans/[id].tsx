@@ -7,25 +7,20 @@ import withDragAndDrop, { DragFromOutsideItemArgs, withDragAndDropProps } from '
 
 import { useRouter } from 'next/router'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { usePlan, useCalendarEvents, CalendarEvent } from '../../lib/swr'
 import { Category, ScheduledItem } from '@prisma/client'
 import { mutate } from 'swr'
 
 const djLocalizer = dayjsLocalizer(dayjs)
 
+const DnDCalendar = withDragAndDrop<CalendarEvent>(Calendar)
+
 const PlanPage = () => {
   const { data: session } = useSession()
 
   const router = useRouter()
   const { id } = router.query
-
-  const { defaultView } = useMemo(
-    () => ({
-      defaultView: Views.WEEK,
-    }),
-    []
-  )
 
   // const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
 
@@ -34,9 +29,7 @@ const PlanPage = () => {
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent>()
   const dragFromOutsideItem = useCallback(() => draggedEvent, [draggedEvent])
 
-  const handleDragStart = useCallback((event: CalendarEvent) => {
-    setDraggedEvent(event)
-  }, [])
+  const handleDragStart = (event: CalendarEvent) => { setDraggedEvent(event) }
 
   const onEventDrop: withDragAndDropProps<CalendarEvent>['onEventDrop'] =
     ({ event, start, end }) => {
@@ -145,8 +138,6 @@ const PlanPage = () => {
   if (isLoadingItem) return <div>Loading ...</div>
   if (isErrorItem) return <div>An error occured</div>
 
-  const DnDCalendar = withDragAndDrop<CalendarEvent>(Calendar)
-
   const placeListHeight = '275px'
 
   return (
@@ -165,7 +156,7 @@ const PlanPage = () => {
                   week: true,
                   agenda: true
                 }}
-                defaultView={defaultView}
+                defaultView={Views.WEEK}
                 dayLayoutAlgorithm={'no-overlap'}
                 components={{
                   event: EventComponent,
@@ -176,12 +167,11 @@ const PlanPage = () => {
                 onDropFromOutside={onDropFromOutside}
                 onEventDrop={onEventDrop}
                 onEventResize={onEventResize}
-                handleDragStart={handleDragStart}
                 resizable
               />
             </div>
             <div
-              className="container fixed bottom-0"
+              className="container fixed bottom-0 z-40"
               style={{ height: `${placeListHeight}` }}
               onDragOver={(e) => { e.stopPropagation() }}
               onDrop={(e) => { e.stopPropagation() }}
