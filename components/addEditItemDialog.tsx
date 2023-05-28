@@ -63,13 +63,13 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
 
   return (
     <Dialog header={category} visible={visible} style={{ width: '50vw' }} footer={renderFooter} onHide={() => { onHide() }}>
-      <div className="grid p-fluid">
+      <form className="p-fluid">
         <div className="field py-3">
           <span className="p-float-label">
             <Controller name="name" control={control} rules={{ required: 'Place is required.' }} render={({ field, fieldState }) => (
               <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
             )} />
-            <label htmlFor="place" className={classNames({ 'p-error': errors.name })}>Place*</label>
+            <label htmlFor="name" className={classNames({ 'p-error': errors.name })}>Place*</label>
           </span>
         </div>
 
@@ -81,7 +81,7 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
             <label htmlFor="description">Description</label>
           </span>
         </div>
-      </div>
+      </form>
     </Dialog>
   )
 };
