@@ -76,9 +76,10 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
         <div className="field py-3">
           <span className="p-float-label">
             <Controller name="notes" control={control} render={({ field }) => (
+              //@ts-ignore
               <InputText id={field.name} {...field} autoFocus />
             )} />
-            <label htmlFor="description">Description</label>
+            <label htmlFor="notes">Description</label>
           </span>
         </div>
       </form>
