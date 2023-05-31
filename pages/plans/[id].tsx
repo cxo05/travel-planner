@@ -2,7 +2,7 @@ import { useSession } from 'next-auth/react'
 import PlaceList from '../../components/placeList'
 
 import dayjs from 'dayjs'
-import { Calendar, EventProps, Views, dayjsLocalizer } from 'react-big-calendar'
+import { Calendar, Views, dayjsLocalizer } from 'react-big-calendar'
 import withDragAndDrop, { DragFromOutsideItemArgs, withDragAndDropProps } from 'react-big-calendar/lib/addons/dragAndDrop'
 
 import { useRouter } from 'next/router'
@@ -11,6 +11,8 @@ import { useCallback, useState } from 'react'
 import { usePlan, useCalendarEvents, CalendarEvent } from '../../lib/swr'
 import { Category, ScheduledItem } from '@prisma/client'
 import { mutate } from 'swr'
+import EventComponent from '../../components/Calendar/customEvent'
+import ToolbarComponent from '../../components/Calendar/customToolbar'
 
 const djLocalizer = dayjsLocalizer(dayjs)
 
@@ -79,53 +81,6 @@ const PlanPage = () => {
     [draggedEvent, setDraggedEvent, id]
   )
 
-  const deleteEvent = (event: CalendarEvent) => {
-    fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
-      method: 'DELETE'
-    }).then((res) => {
-      return res.json()
-    }).then((data) => {
-      mutate(`/api/scheduledItem?planId=${id}`)
-    })
-  }
-
-  const EventComponent = ({ event }: EventProps<CalendarEvent>) => {
-    const [displayDelete, setDisplayDelete] = useState(false)
-    let icon;
-    switch (event.category) {
-      case Category.SIGHTSEEING:
-        icon = 'landscape'
-        break;
-      case Category.FOOD:
-        icon = 'restaurant'
-        break;
-      case Category.ACTIVITIES:
-        // Maybe an icon
-        break;
-    }
-
-    return (
-      <div
-        className='h-full flex flex-col items-center justify-center'
-        onMouseEnter={() => setDisplayDelete(true)}
-        onMouseLeave={() => setDisplayDelete(false)}
-      >
-        {displayDelete &&
-          <div
-            className='absolute right-0 top-0 p-2'
-            onClick={() => deleteEvent(event)}
-          >
-            <i className="pi pi-times text-red-600 font-semibold"></i>
-          </div>
-        }
-        <span className="material-symbols-outlined px-1">
-          {icon}
-        </span>
-        <span>{event.title}</span>
-      </div>
-    )
-  }
-
   const eventPropGetter = (event: CalendarEvent) => ({
     ...(event.category == Category.FOOD && {
       className: 'bg-teal-400',
@@ -160,6 +115,12 @@ const PlanPage = () => {
                 dayLayoutAlgorithm={'no-overlap'}
                 components={{
                   event: EventComponent,
+                  toolbar: (props) => {
+                    let combinedProps = { ...props, planId: id };
+                    return (<ToolbarComponent
+                      {...combinedProps}
+                    />)
+                  }
                 }}
                 eventPropGetter={eventPropGetter}
                 //@ts-ignore
@@ -176,7 +137,7 @@ const PlanPage = () => {
               onDragOver={(e) => { e.stopPropagation() }}
               onDrop={(e) => { e.stopPropagation() }}
             >
-              <div className="" style={{ boxShadow: "0 -5px 5px -5px #333", backgroundColor: "white" }}>
+              <div style={{ boxShadow: "0 -5px 5px -5px #333", backgroundColor: "white" }}>
                 <PlaceList handleDragStart={handleDragStart}></PlaceList>
               </div>
             </div>

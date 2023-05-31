@@ -23,6 +23,7 @@ export class CalendarEvent {
   start?: Date
   end?: Date
   scheduledItemId?: number
+  planId: string
   // desc: string
   allDay?: boolean
 
@@ -33,6 +34,7 @@ export class CalendarEvent {
     this.start = scheduledItem.startDate
     this.end = scheduledItem.endDate
     this.scheduledItemId = scheduledItem.id
+    this.planId = scheduledItem.planId
     this.allDay = false
   }
 }
