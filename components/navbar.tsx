@@ -23,7 +23,7 @@ const Navbar = () => {
             <div className="text-lg font-bold text-gray-100">{plan.title}</div>
           }
           <div className="flex items-center space-x-5 text-gray-100">
-            <Button icon="pi pi-home" rounded onClick={() => { window.location.href = "/"; }} />
+            <Button icon="pi pi-home" rounded onClick={() => router.push('/')} />
             {status === "authenticated" && <p>{userEmail}</p>}
             <div className={styles.signup}>
               {status === "authenticated" ? (
