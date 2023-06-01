@@ -16,7 +16,7 @@ const Navbar = () => {
   return (
     <nav className="flex flex-col justify-center overflow-hidden bg-gray-50">
       <div className='bg-blue-400'>
-        <div className="flex items-center justify-between border-b container mx-auto p-3">
+        <div className="flex items-center justify-between container mx-auto p-3">
           <div className="text-lg font-bold text-gray-100">Travel Planner</div>
           {
             plan &&
