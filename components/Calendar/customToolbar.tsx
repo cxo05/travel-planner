@@ -2,8 +2,10 @@ import { Button } from 'primereact/button';
 import { Menu } from 'primereact/menu';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
+
+import EditPlanDialog from '../editPlanDialog'
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   return viewNames.map((name: any) => (
@@ -22,6 +24,7 @@ interface CustomToolbarProps extends ToolbarProps {
   planId: string | string[] | undefined
 }
 
+
 const ToolbarComponent = ({
   label,
   localizer: { messages },
@@ -32,7 +35,8 @@ const ToolbarComponent = ({
   planId,
 }: CustomToolbarProps
 ) => {
-  const menuRight = useRef<Menu>(null);
+  const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
+  const menuRight = useRef<Menu>(null); 
 
   const items = [
     {
@@ -42,7 +46,7 @@ const ToolbarComponent = ({
           label: 'Edit',
           icon: 'pi pi-pencil',
           command: () => {
-            //toast.current.show({ severity: 'success', summary: 'Updated', detail: 'Data Updated', life: 3000 });
+            setVisibleEditPopUp(true);
           }
         },
         {
@@ -72,6 +76,7 @@ const ToolbarComponent = ({
 
   return (
     <div className="rbc-toolbar">
+      <EditPlanDialog planId={planId} visible={visibleEditPopUp} onHide={() => setVisibleEditPopUp(false)}></EditPlanDialog>
       <span className="rbc-btn-group">
         <ViewNamesGroup
           view={view}
