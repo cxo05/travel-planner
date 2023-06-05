@@ -13,10 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: {
           id: `${id}`,
         },
-        include: {
-          Plan: true,
-        },
-      })      
+      })
       res.json(getUser)
       break
     case 'PUT':
@@ -24,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       //res.status(200).json({ id, name: name || `User ${id}` })
       break
     default:
-      //res.setHeader('Allow', ['GET', 'PUT'])
-      //res.status(405).end(`Method ${method} Not Allowed`)
+    //res.setHeader('Allow', ['GET', 'PUT'])
+    //res.status(405).end(`Method ${method} Not Allowed`)
   }
 }

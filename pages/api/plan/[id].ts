@@ -9,8 +9,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     method,
   } = req
 
-  //TODO Verify User Session
-
   switch (method) {
     case 'GET':
       const getPlan = await prisma.plan.findUnique({
@@ -20,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         include: {
           Items: true
         }
-      })      
+      })
       res.json(getPlan)
       break
     case 'PUT':

@@ -72,15 +72,18 @@ export default Home
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const session = await getSession(ctx);
 
-  const plans = await prisma.plan.findMany({
+  const plans = await prisma.usersOnPlan.findMany({
     where: {
       userId: String(session?.user.id),
+    },
+    select: {
+      plan: true
     }
   })
 
   return {
     props: {
-      plans: JSON.parse(JSON.stringify(plans))
+      plans: JSON.parse(JSON.stringify(plans.map(p => p.plan)))
     }
   }
 }

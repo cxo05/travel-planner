@@ -132,12 +132,12 @@ const PlanPage = () => {
               />
             </div>
             <div
-              className="container fixed bottom-0 z-40"
+              className="container fixed bottom-0 z-40 bg-white"
               style={{ height: `${placeListHeight}` }}
               onDragOver={(e) => { e.stopPropagation() }}
               onDrop={(e) => { e.stopPropagation() }}
             >
-              <div style={{ boxShadow: "0 -5px 5px -5px #333", backgroundColor: "white" }}>
+              <div style={{ boxShadow: "0 -5px 5px -5px #333" }}>
                 <PlaceList handleDragStart={handleDragStart}></PlaceList>
               </div>
             </div>
