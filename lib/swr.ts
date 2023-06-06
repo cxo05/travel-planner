@@ -16,6 +16,18 @@ const scheduledItemsWithDetails = Prisma.validator<Prisma.ScheduledItemArgs>()({
 
 export type ScheduledItemsWithDetails = Prisma.ScheduledItemGetPayload<typeof scheduledItemsWithDetails>
 
+const planWithCollaborators = Prisma.validator<Prisma.PlanArgs>()({
+  include: {
+    UsersOnPlan: {
+      select: {
+        user: true
+      }
+    }
+  }
+})
+
+export type PlanWithCollaborators = Prisma.PlanGetPayload<typeof planWithCollaborators>
+
 export class CalendarEvent {
   title: string
   category: Category

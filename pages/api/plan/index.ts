@@ -31,6 +31,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           UsersOnPlan: {
             create: {
               userId: String(session?.user.id),
+              isCreator: true
             }
           }
         },

@@ -2,21 +2,27 @@ import type { GetServerSideProps, NextPage } from 'next'
 import { getSession, useSession } from "next-auth/react"
 
 import { Card } from 'primereact/card';
+import { Button } from 'primereact/button';
 import { Avatar } from 'primereact/avatar';
 import { AvatarGroup } from 'primereact/avatargroup';
 
 import prisma from '../lib/prisma';
-import { Plan } from '@prisma/client';
-import { useState } from 'react';
+import { Plan, User } from '@prisma/client';
+import { useState, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
+import { PlanWithCollaborators } from '../lib/swr';
+import SharingDialog from '../components/sharingDialog';
 
 interface Plans {
-  plans: Plan[]
+  plans: PlanWithCollaborators[]
 }
 
 const Home: NextPage<Plans> = ({ plans }) => {
   const { data: session } = useSession()
   const [loading, setLoading] = useState(false)
+
+  const [visiblePopUp, setVisiblePopUp] = useState(false);
+  const [sharePlanId, setSharePlanId] = useState('');
 
   const router = useRouter();
 
@@ -35,31 +41,54 @@ const Home: NextPage<Plans> = ({ plans }) => {
     })
   }
 
-  const footer = (
+  const share = (e: MouseEvent<HTMLElement>, planId: string) => {
+    e.stopPropagation()
+    setSharePlanId(planId)
+    setVisiblePopUp(true)
+  }
+
+  const title = (title: string, planId: string) => (
+    <p className='flex justify-between items-center'>
+      {title}
+      <Button icon="pi pi-share-alt" rounded text aria-label="Share" onClick={(e) => share(e, planId)} />
+    </p>
+  )
+
+  const footer = (users: User[]) => (
     <AvatarGroup>
-      <Avatar image={session?.user.image} shape="circle" />
-      {/* TODO Add other collaborators */}
+      {users.map((user) => (
+        <Avatar key={user.id} image={user.image || ''} shape='circle' pt={{ image: { "referrerPolicy": "no-referrer" } }}></Avatar>
+      ))}
       {/* <Avatar label="+2" shape="circle" size="large" style={{ backgroundColor: '#9c27b0', color: '#ffffff' }} /> */}
     </AvatarGroup>
-  );
+  )
 
   return (
     <main className='container mx-auto p-3'>
       <p className='text-xl py-4'>Your Plans</p>
       {session && session.user ? (
-        <div className="grid auto-rows-fr grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
-          {plans.map((obj) => (
-            <Card className="hover:bg-slate-200" key={obj.id} title={obj.title} footer={footer} onClick={() => router.push(`/plans/${obj.id}`)}>
-              <p>{new Date(obj.startDate).toDateString()}</p>
-              {obj.endDate ? <p>{new Date(obj.endDate).toDateString()}</p> : <></>}
-            </Card>
-          ))}
-          <div className='grid p-card bg-slate-300 hover:bg-slate-400 place-content-center min-h-[130px]' onClick={() => handleNewPlan()}>
-            {loading ?
-              <i className='pi pi-spin pi-spinner text-4xl'></i> :
-              <i className='pi pi-plus text-4xl'></i>}
+        <>
+          <div className="grid auto-rows-fr grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
+            {plans.map((plan) => (
+              <Card
+                className="hover:bg-slate-200"
+                key={plan.id}
+                title={title(plan.title, plan.id)}
+                footer={footer(plan.UsersOnPlan.map(u => u.user))}
+                onClick={() => router.push(`/plans/${plan.id}`)}
+              >
+                <p>{new Date(plan.startDate).toDateString()}</p>
+                {plan.endDate ? <p>{new Date(plan.endDate).toDateString()}</p> : <></>}
+              </Card>
+            ))}
+            <div className='grid p-card bg-slate-300 hover:bg-slate-400 place-content-center min-h-[130px]' onClick={() => handleNewPlan()}>
+              {loading ?
+                <i className='pi pi-spin pi-spinner text-4xl'></i> :
+                <i className='pi pi-plus text-4xl'></i>}
+            </div>
           </div>
-        </div>
+          <SharingDialog planId={sharePlanId} visible={visiblePopUp} onHide={() => setVisiblePopUp(false)}></SharingDialog>
+        </>
       ) : (
         <p>You need to sign in to save your progress</p>
       )}
@@ -77,7 +106,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       userId: String(session?.user.id),
     },
     select: {
-      plan: true
+      plan: {
+        include: {
+          UsersOnPlan: {
+            select: {
+              user: true
+            }
+          }
+        }
+      },
     }
   })
 
