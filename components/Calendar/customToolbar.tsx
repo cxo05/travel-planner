@@ -2,8 +2,11 @@ import { Button } from 'primereact/button';
 import { Menu } from 'primereact/menu';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
+
+import EditPlanDialog from '../editPlanDialog'
+import { Plan } from '@prisma/client';
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   return viewNames.map((name: any) => (
@@ -19,8 +22,9 @@ const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
 }
 
 interface CustomToolbarProps extends ToolbarProps {
-  planId: string | string[] | undefined
+  plan: Plan | undefined
 }
+
 
 const ToolbarComponent = ({
   label,
@@ -29,10 +33,11 @@ const ToolbarComponent = ({
   onView,
   view,
   views,
-  planId,
+  plan,
 }: CustomToolbarProps
 ) => {
-  const menuRight = useRef<Menu>(null);
+  const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
+  const menuRight = useRef<Menu>(null); 
 
   const items = [
     {
@@ -42,7 +47,7 @@ const ToolbarComponent = ({
           label: 'Edit',
           icon: 'pi pi-pencil',
           command: () => {
-            //toast.current.show({ severity: 'success', summary: 'Updated', detail: 'Data Updated', life: 3000 });
+            setVisibleEditPopUp(true);
           }
         },
         {
@@ -55,7 +60,7 @@ const ToolbarComponent = ({
               icon: 'pi pi-info-circle',
               acceptClassName: 'p-button-danger',
               accept: () => {
-                fetch(`/api/plan/${planId}`, {
+                fetch(`/api/plan/${plan?.id}`, {
                   method: 'DELETE'
                 }).then((res) => {
                   return res.json()
@@ -72,6 +77,7 @@ const ToolbarComponent = ({
 
   return (
     <div className="rbc-toolbar">
+      <EditPlanDialog plan={plan} visible={visibleEditPopUp} onHide={() => setVisibleEditPopUp(false)}></EditPlanDialog>
       <span className="rbc-btn-group">
         <ViewNamesGroup
           view={view}
