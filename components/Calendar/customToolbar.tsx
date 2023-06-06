@@ -6,6 +6,7 @@ import { useRef, useState } from 'react';
 import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
 
 import EditPlanDialog from '../editPlanDialog'
+import { Plan } from '@prisma/client';
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   return viewNames.map((name: any) => (
@@ -21,7 +22,7 @@ const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
 }
 
 interface CustomToolbarProps extends ToolbarProps {
-  planId: string | string[] | undefined
+  plan: Plan | undefined
 }
 
 
@@ -32,7 +33,7 @@ const ToolbarComponent = ({
   onView,
   view,
   views,
-  planId,
+  plan,
 }: CustomToolbarProps
 ) => {
   const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
@@ -59,7 +60,7 @@ const ToolbarComponent = ({
               icon: 'pi pi-info-circle',
               acceptClassName: 'p-button-danger',
               accept: () => {
-                fetch(`/api/plan/${planId}`, {
+                fetch(`/api/plan/${plan?.id}`, {
                   method: 'DELETE'
                 }).then((res) => {
                   return res.json()
@@ -76,7 +77,7 @@ const ToolbarComponent = ({
 
   return (
     <div className="rbc-toolbar">
-      <EditPlanDialog planId={planId} visible={visibleEditPopUp} onHide={() => setVisibleEditPopUp(false)}></EditPlanDialog>
+      <EditPlanDialog plan={plan} visible={visibleEditPopUp} onHide={() => setVisibleEditPopUp(false)}></EditPlanDialog>
       <span className="rbc-btn-group">
         <ViewNamesGroup
           view={view}

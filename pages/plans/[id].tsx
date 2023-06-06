@@ -24,7 +24,7 @@ const PlanPage = () => {
   const router = useRouter()
   const { id } = router.query
 
-  // const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
+  const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
 
   const { calendarEvents, isLoading: isLoadingItem, isError: isErrorItem } = useCalendarEvents(id)
 
@@ -116,7 +116,7 @@ const PlanPage = () => {
                 components={{
                   event: EventComponent,
                   toolbar: (props) => {
-                    let combinedProps = { ...props, planId: id };
+                    let combinedProps = { ...props, plan: plan };
                     return (<ToolbarComponent
                       {...combinedProps}
                     />)

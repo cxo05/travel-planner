@@ -5,36 +5,32 @@ import { classNames } from 'primereact/utils';
 import { NextPage } from "next";
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Item } from '@prisma/client';
+import { Plan } from '@prisma/client';
 import { useSWRConfig } from 'swr';
 
-interface Props {
-  planId: string | string[] | undefined
+interface EditPlanProps {
+  plan: Plan | undefined
   visible: boolean
   onHide: () => void
 }
 
-const defaultValues = {
-  name: '',
-}
+const EditPlanDialog: NextPage<EditPlanProps> = (props) => {
+  const { plan, visible, onHide } = props;
 
-const EditPlanDialog: NextPage<Props> = (props) => {
-  const { planId, visible, onHide } = props;
-
-  const { control, formState: { errors }, handleSubmit, reset } = useForm<Item>({ defaultValues });
+  const { control, formState: { errors }, handleSubmit, reset } = useForm<Plan>({ });
   const { mutate } = useSWRConfig()
 
-  const onSubmit = (newItem: Item) => {
-    fetch(`/api/plan/${planId}`, {
-      body: JSON.stringify({ title: newItem.name }),
+  const onSubmit = (editPlan: Plan) => {
+    fetch(`/api/plan/${plan?.id}`, {
+      body: JSON.stringify({ title: editPlan.title }),
       headers: {
         'Content-Type': 'application/json'
       },
       method: 'PUT'
     }).then((res) => {
-      return res.json() as Promise<Item>
+      return res.json() as Promise<Plan>
     }).then((data) => {
-      mutate(`/api/plan?planId=${planId}`)
+      mutate(`/api/plan?planId=${plan?.id}`)
       onHide();
     })
   };
@@ -53,10 +49,10 @@ const EditPlanDialog: NextPage<Props> = (props) => {
       <form className="p-fluid">
         <div className="field py-3">
           <span className="p-float-label">
-            <Controller name="name" control={control} rules={{ required: 'Name is required.' }} render={({ field, fieldState }) => (
+            <Controller name="title" control={control} rules={{ required: 'Name is required.' }} render={({ field, fieldState }) => (
               <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
             )} />
-            <label htmlFor="name" className={classNames({ 'p-error': errors.name })}>Name</label>
+            <label htmlFor="name" className={classNames({ 'p-error': errors.title })}>{plan?.title}</label>
           </span>
         </div>
       </form>
