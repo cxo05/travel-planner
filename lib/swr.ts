@@ -16,6 +16,18 @@ const scheduledItemsWithDetails = Prisma.validator<Prisma.ScheduledItemArgs>()({
 
 export type ScheduledItemsWithDetails = Prisma.ScheduledItemGetPayload<typeof scheduledItemsWithDetails>
 
+const planWithCollaborators = Prisma.validator<Prisma.PlanArgs>()({
+  include: {
+    UsersOnPlan: {
+      select: {
+        user: true
+      }
+    }
+  }
+})
+
+export type PlanWithCollaborators = Prisma.PlanGetPayload<typeof planWithCollaborators>
+
 export class CalendarEvent {
   title: string
   category: Category
@@ -23,6 +35,7 @@ export class CalendarEvent {
   start?: Date
   end?: Date
   scheduledItemId?: number
+  planId: string
   // desc: string
   allDay?: boolean
 
@@ -33,6 +46,7 @@ export class CalendarEvent {
     this.start = scheduledItem.startDate
     this.end = scheduledItem.endDate
     this.scheduledItemId = scheduledItem.id
+    this.planId = scheduledItem.planId
     this.allDay = false
   }
 }

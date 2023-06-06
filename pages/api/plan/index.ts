@@ -1,19 +1,23 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getSession } from 'next-auth/react';
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../auth/[...nextauth]"
 import prisma from '../../../lib/prisma';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { title, startDate, endDate} = req.body;
+  const { title, startDate, endDate } = req.body;
 
   const method = req.method;
 
-  const session = await getSession({ req });
+  const session = await getServerSession(req, res, authOptions);
 
   switch (method) {
     case 'GET':
-      const getPlans = await prisma.plan.findMany({
+      const getPlans = await prisma.usersOnPlan.findMany({
         where: {
           userId: String(session?.user.id),
+        },
+        include: {
+          plan: true
         }
       })
       res.json(getPlans);
@@ -21,10 +25,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     case 'POST':
       const addPlan = await prisma.plan.create({
         data: {
-          userId: String(session?.user.id),
           title: title,
           startDate: startDate,
           endDate: endDate,
+          UsersOnPlan: {
+            create: {
+              userId: String(session?.user.id),
+              isCreator: true
+            }
+          }
         },
       })
       res.json(addPlan);

@@ -64,6 +64,7 @@ const PlaceCard: NextPage<Props> = (props) => {
           root.render(dragImage);
           let scheduledItem: CalendarEvent = {
             itemId: item.id,
+            planId: item.planId,
             title: item.name,
             category: item.category
           }

@@ -16,14 +16,14 @@ const Navbar = () => {
   return (
     <nav className="flex flex-col justify-center overflow-hidden bg-gray-50">
       <div className='bg-blue-400'>
-        <div className="flex items-center justify-between border-b container mx-auto p-3">
+        <div className="flex items-center justify-between container mx-auto p-3">
           <div className="text-lg font-bold text-gray-100">Travel Planner</div>
           {
             plan &&
             <div className="text-lg font-bold text-gray-100">{plan.title}</div>
           }
           <div className="flex items-center space-x-5 text-gray-100">
-            <Button icon="pi pi-home" rounded onClick={() => { window.location.href = "/"; }} />
+            <Button icon="pi pi-home" rounded onClick={() => router.push('/')} />
             {status === "authenticated" && <p>{userEmail}</p>}
             <div className={styles.signup}>
               {status === "authenticated" ? (
