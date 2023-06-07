@@ -18,7 +18,7 @@ const PlaceList: NextPage<Props> = (props) => {
   const { handleDragStart } = props;
 
   const router = useRouter()
-  const { planId } = router.query
+  const { id } = router.query
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [visiblePopUp, setVisiblePopUp] = useState(false);
@@ -26,7 +26,7 @@ const PlaceList: NextPage<Props> = (props) => {
 
   const [editItem, setEditItem] = useState<Item | undefined>(undefined);
 
-  const { items, isLoading, isError } = useItems(planId)
+  const { items, isLoading, isError } = useItems(id)
 
   if (isLoading) return <div>Loading ...</div>
   if (isError) return <div>An error occured</div>
@@ -66,7 +66,7 @@ const PlaceList: NextPage<Props> = (props) => {
 
   return (
     <div className='pt-4 select-none'>
-      <AddEditItemDialog planId={planId} item={editItem} visible={visiblePopUp} category={displayHeader} onHide={() => setVisiblePopUp(false)}></AddEditItemDialog>
+      <AddEditItemDialog planId={id} item={editItem} visible={visiblePopUp} category={displayHeader} onHide={() => setVisiblePopUp(false)}></AddEditItemDialog>
       <div className="flex items-center justify-center mx-5">
         <p className='text-lg font-bold'>Places</p>
         <div className='flex-grow'></div>
