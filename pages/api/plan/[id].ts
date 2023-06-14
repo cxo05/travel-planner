@@ -5,7 +5,7 @@ import prisma from '../../../lib/prisma'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const {
     query: { id },
-    body: { title, startDate, endDate },
+    body: { title, location, startDate, endDate },
     method,
   } = req
 
@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         data: {
           title: title,
+          location: location,
           startDate: startDate,
           endDate: endDate,
         },
