@@ -7,30 +7,48 @@ import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Plan } from '@prisma/client';
 import { useRouter } from 'next/router';
+import { useSWRConfig } from 'swr';
 
-interface AddPlanProps {
+interface PlanProps {
+  plan: Plan | undefined
   visible: boolean
   onHide: () => void
 }
 
-const AddPlanDialog: NextPage<AddPlanProps> = (props) => {
-  const { visible, onHide } = props;
+const PlanDialog: NextPage<PlanProps> = (props) => {
+  const { plan, visible, onHide } = props;
 
   const { control, formState: { errors }, handleSubmit } = useForm<Plan>({});
+  const { mutate } = useSWRConfig()
   const router = useRouter();
 
-  const onSubmit = (plan: Plan) => {
-    fetch('/api/plan', {
-      body: JSON.stringify({ title: plan.title, location: plan.location, userId: plan.id }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST'
-    }).then((res) => {
-      return res.json() as Promise<Plan>
-    }).then((data) => {
-      router.push(`/plans/${data.id}`)
-    })
+  const onSubmit = (newPlan: Plan) => {
+    if (plan === undefined) {
+      fetch('/api/plan', {
+        body: JSON.stringify({ title: newPlan.title, location: newPlan.location, userId: newPlan.id }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'POST'
+      }).then((res) => {
+        return res.json() as Promise<Plan>
+      }).then((data) => {
+        router.push(`/plans/${data.id}`)
+      })
+    } else {
+      fetch(`/api/plan/${plan?.id}`, {
+        body: JSON.stringify({ title: newPlan.title, location: newPlan.location }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'PUT'
+      }).then((res) => {
+        return res.json() as Promise<Plan>
+      }).then((data) => {
+        mutate(`/api/plan?planId=${plan?.id}`)
+        onHide();
+      })
+    }
   };
 
   const renderFooter = () => {
@@ -43,14 +61,14 @@ const AddPlanDialog: NextPage<AddPlanProps> = (props) => {
   }
 
   return (
-    <Dialog header={"Add New Plan"} visible={visible} style={{ width: '50vw' }} footer={renderFooter} onHide={() => { onHide() }}>
+    <Dialog header={plan ? "Edit" : "Add New Plan"} visible={visible} style={{ width: '50vw' }} footer={renderFooter} onHide={() => { onHide() }}>
       <form className="p-fluid">
         <div className="field py-3">
           <span className="p-float-label">
             <Controller name="title" control={control} rules={{ required: 'Name is required.' }} render={({ field, fieldState }) => (
               <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
             )} />
-            <label htmlFor="title" className={classNames({ 'p-error': errors.title })}>Plan Name*</label>
+            <label htmlFor="title" className={classNames({ 'p-error': errors.title })}>{plan ? plan.title : "Plan Name*"}</label>
           </span>
         </div>
         <div className="field py-3">
@@ -59,7 +77,7 @@ const AddPlanDialog: NextPage<AddPlanProps> = (props) => {
               //@ts-ignore
               <InputText id={field.name} {...field} autoFocus />
             )} />
-            <label htmlFor="location">Location</label>
+            <label htmlFor="location">{plan ? plan.location : "Location"}</label>
           </span>
         </div>
       </form>
@@ -67,4 +85,4 @@ const AddPlanDialog: NextPage<AddPlanProps> = (props) => {
   )
 };
 
-export default AddPlanDialog;
+export default PlanDialog;

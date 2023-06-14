@@ -12,7 +12,7 @@ import { useState, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
 import { PlanWithCollaborators } from '../lib/swr';
 import SharingDialog from '../components/sharingDialog';
-import AddPlanDialog from '../components/addPlanDialog';
+import PlanDialog from '../components/planDialog';
 
 interface Plans {
   plans: PlanWithCollaborators[]
@@ -62,13 +62,14 @@ const Home: NextPage<Plans> = ({ plans }) => {
       {session && session.user ? (
         <>
           <div className="grid auto-rows-fr grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
-            <AddPlanDialog
+            <PlanDialog
+              plan={undefined}
               visible={addPlanVisiblePopUp}
               onHide={() => {
                 setAddPlanVisiblePopUp(false)
                 setLoading(false)
               }}
-            ></AddPlanDialog>
+            ></PlanDialog>
             {plans.map((plan) => (
               <Card
                 className="hover:bg-slate-200"

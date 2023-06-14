@@ -5,7 +5,7 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { useRef, useState } from 'react';
 import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
 
-import EditPlanDialog from '../editPlanDialog'
+import PlanDialog from '../planDialog'
 import { Plan } from '@prisma/client';
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
@@ -77,7 +77,7 @@ const ToolbarComponent = ({
 
   return (
     <div className="rbc-toolbar">
-      <EditPlanDialog plan={plan} visible={visibleEditPopUp} onHide={() => setVisibleEditPopUp(false)}></EditPlanDialog>
+      <PlanDialog plan={plan} visible={visibleEditPopUp} onHide={() => setVisibleEditPopUp(false)}></PlanDialog>
       <span className="rbc-btn-group">
         <ViewNamesGroup
           view={view}
