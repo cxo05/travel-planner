@@ -12,6 +12,7 @@ import { useState, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
 import { PlanWithCollaborators } from '../lib/swr';
 import SharingDialog from '../components/sharingDialog';
+import AddPlanDialog from '../components/addPlanDialog';
 
 interface Plans {
   plans: PlanWithCollaborators[]
@@ -21,30 +22,21 @@ const Home: NextPage<Plans> = ({ plans }) => {
   const { data: session } = useSession()
   const [loading, setLoading] = useState(false)
 
-  const [visiblePopUp, setVisiblePopUp] = useState(false);
+  const [sharePlanVisiblePopUp, setSharePlanVisiblePopUp] = useState(false);
+  const [addPlanVisiblePopUp, setAddPlanVisiblePopUp] = useState(false);
   const [sharePlanId, setSharePlanId] = useState('');
 
   const router = useRouter();
 
   async function handleNewPlan() {
     setLoading(true)
-    fetch('/api/plan', {
-      body: JSON.stringify({ title: 'New Plan', userId: session?.user.id }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'POST'
-    }).then((res) => {
-      return res.json() as Promise<Plan>
-    }).then((data) => {
-      router.push(`/plans/${data.id}`)
-    })
+    setAddPlanVisiblePopUp(true)
   }
 
   const share = (e: MouseEvent<HTMLElement>, planId: string) => {
     e.stopPropagation()
     setSharePlanId(planId)
-    setVisiblePopUp(true)
+    setSharePlanVisiblePopUp(true)
   }
 
   const title = (title: string, planId: string) => (
@@ -70,6 +62,7 @@ const Home: NextPage<Plans> = ({ plans }) => {
       {session && session.user ? (
         <>
           <div className="grid auto-rows-fr grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
+            <AddPlanDialog visible={addPlanVisiblePopUp} onHide={() => setAddPlanVisiblePopUp(false)}></AddPlanDialog>
             {plans.map((plan) => (
               <Card
                 className="hover:bg-slate-200"
@@ -88,7 +81,7 @@ const Home: NextPage<Plans> = ({ plans }) => {
                 <i className='pi pi-plus text-4xl'></i>}
             </div>
           </div>
-          <SharingDialog planId={sharePlanId} visible={visiblePopUp} onHide={() => setVisiblePopUp(false)}></SharingDialog>
+          <SharingDialog planId={sharePlanId} visible={sharePlanVisiblePopUp} onHide={() => setSharePlanVisiblePopUp(false)}></SharingDialog>
         </>
       ) : (
         <p>You need to sign in to save your progress</p>

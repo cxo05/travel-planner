@@ -47,7 +47,7 @@ const ToolbarComponent = ({
           label: 'Edit',
           icon: 'pi pi-pencil',
           command: () => {
-            setVisibleEditPopUp(true);
+            setVisibleEditPopUp(true)
           }
         },
         {
