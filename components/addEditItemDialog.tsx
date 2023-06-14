@@ -20,30 +20,34 @@ interface Props {
 
 const defaultValues = {
   name: '',
+  place_id: '',
   notes: ''
 }
 
 const libraries: ("drawing" | "geometry" | "localContext" | "places" | "visualization")[] = ["places"]
 
 const AddEditItemDialog: NextPage<Props> = (props) => {
-  const { planId, item, visible, category, onHide } = props;
+  const { planId, item, visible, category, onHide } = props
 
-  const [autocomplete, setAutocomplete] = useState<any>(null)
+  const { register, setValue, handleSubmit, reset } = useForm<Item>({ defaultValues })
 
-  const { register, formState: { errors }, handleSubmit, reset } = useForm<Item>({ defaultValues });
-
-  const [map, setMap] = useState<google.maps.Map>()
+  const [map, setMap] = useState<any>(null)
 
   const { isLoaded } = useJsApiLoader({
-    id: "google",
+    id: "google-map-script",
     googleMapsApiKey: process.env.GOOGLE_API_KEY || '',
     libraries: libraries
-  });
+  })
 
   const [center, setCenter] = useState({
     lat: 41.39860674724766,
     lng: 2.1999917272411134,
-  });
+  })
+
+
+  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete>()
+
+  const [marker, setMarker] = useState<google.maps.Marker>()
 
   const onLoad = useCallback((map: google.maps.Map) => {
     // If editing, set to previous address center
@@ -53,25 +57,46 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
     setMap(map)
   }, [center])
 
-  const onAutocompleteLoad = useCallback((autocomplete: React.SetStateAction<google.maps.places.Autocomplete | undefined>) => {
+  const onAutocompleteLoad = useCallback((autocomplete: google.maps.places.Autocomplete) => {
     console.log("Loaded")
     setAutocomplete(autocomplete)
   }, [])
 
-  const onUnmount = () => setMap(undefined)
+  const onMapClick = (e: google.maps.MapMouseEvent) => {
+    let service = new google.maps.places.PlacesService(map);
+    if (!("placeId" in e)) {
+      return
+    }
+
+    service.getDetails({ placeId: e.placeId as string }, (place, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        locationSelected(place!)
+      }
+    })
+  }
 
   const onPlaceChanged = () => {
-    if (autocomplete != null) {
+    if (autocomplete != null && autocomplete != undefined) {
       const place = autocomplete.getPlace();
-      console.log(place);
-
-      setCenter({
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng(),
-      });
+      locationSelected(place)
     } else {
-      alert("Please enter text");
+      alert("Please select a location");
     }
+  }
+
+  function locationSelected(place: google.maps.places.PlaceResult) {
+    map.setZoom(15);
+    map.setCenter(place.geometry?.location);
+
+    if (marker == undefined) {
+      setMarker(new google.maps.Marker())
+    }
+
+    marker!.setMap(map)
+    marker!.setPosition(place.geometry?.location)
+
+    setMarker(marker)
+    setValue("placeId", place.place_id as string)
   }
 
   // Feels a bit hacky, probably a better way to do this
@@ -86,8 +111,9 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
   const { mutate } = useSWRConfig()
 
   const onSubmit = (newItem: Item) => {
+    console.log(newItem)
     fetch(item ? `/api/item/${item.id}` : `/api/item?planId=${planId}`, {
-      body: JSON.stringify({ name: newItem.name, notes: newItem.notes, category: category }),
+      body: JSON.stringify({ name: newItem.name, placeId: newItem.placeId, notes: newItem.notes, category: category }),
       headers: {
         'Content-Type': 'application/json'
       },
@@ -119,13 +145,14 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
               center={center}
               zoom={10}
               onLoad={onLoad}
-              onUnmount={onUnmount}
+              onClick={onMapClick}
+              onUnmount={() => setMap(undefined)}
             >
               <Autocomplete
                 onLoad={onAutocompleteLoad}
                 onPlaceChanged={onPlaceChanged}
                 options={{
-                  fields: ["name", "place_id"]
+                  fields: ["name", "place_id", "geometry"]
                 }}
               >
                 <input

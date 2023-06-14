@@ -32,6 +32,7 @@
     "typescript": "^5.0.4"
   },
   "devDependencies": {
+    "@types/google.maps": "^3.53.4",
     "@types/react-big-calendar": "^1.6.4",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.23",
