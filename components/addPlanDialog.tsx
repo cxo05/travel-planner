@@ -16,12 +16,12 @@ interface AddPlanProps {
 const AddPlanDialog: NextPage<AddPlanProps> = (props) => {
   const { visible, onHide } = props;
 
-  const { control, formState: { errors }, handleSubmit, reset } = useForm<Plan>({ });
+  const { control, formState: { errors }, handleSubmit } = useForm<Plan>({});
   const router = useRouter();
 
   const onSubmit = (plan: Plan) => {
     fetch('/api/plan', {
-      body: JSON.stringify({ title: plan.title, userId: plan.id }),
+      body: JSON.stringify({ title: plan.title, location: plan.location, userId: plan.id }),
       headers: {
         'Content-Type': 'application/json'
       },
@@ -50,7 +50,16 @@ const AddPlanDialog: NextPage<AddPlanProps> = (props) => {
             <Controller name="title" control={control} rules={{ required: 'Name is required.' }} render={({ field, fieldState }) => (
               <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
             )} />
-            <label htmlFor="name" className={classNames({ 'p-error': errors.title })}></label>
+            <label htmlFor="title" className={classNames({ 'p-error': errors.title })}>Plan Name*</label>
+          </span>
+        </div>
+        <div className="field py-3">
+          <span className="p-float-label">
+            <Controller name="location" control={control} render={({ field, fieldState }) => (
+              //@ts-ignore
+              <InputText id={field.name} {...field} autoFocus />
+            )} />
+            <label htmlFor="location">Location</label>
           </span>
         </div>
       </form>

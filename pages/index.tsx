@@ -62,7 +62,13 @@ const Home: NextPage<Plans> = ({ plans }) => {
       {session && session.user ? (
         <>
           <div className="grid auto-rows-fr grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
-            <AddPlanDialog visible={addPlanVisiblePopUp} onHide={() => setAddPlanVisiblePopUp(false)}></AddPlanDialog>
+            <AddPlanDialog
+              visible={addPlanVisiblePopUp}
+              onHide={() => {
+                setAddPlanVisiblePopUp(false)
+                setLoading(false)
+              }}
+            ></AddPlanDialog>
             {plans.map((plan) => (
               <Card
                 className="hover:bg-slate-200"

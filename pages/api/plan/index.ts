@@ -4,7 +4,7 @@ import { authOptions } from "../auth/[...nextauth]"
 import prisma from '../../../lib/prisma';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { title, startDate, endDate } = req.body;
+  const { title, location, startDate, endDate } = req.body;
 
   const method = req.method;
 
@@ -26,6 +26,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const addPlan = await prisma.plan.create({
         data: {
           title: title,
+          location: location,
           startDate: startDate,
           endDate: endDate,
           UsersOnPlan: {
