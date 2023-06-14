@@ -61,6 +61,8 @@ model Plan {
   title     String
   createdAt DateTime @default(now())
 
+  location String?
+
   startDate DateTime  @default(now())
   endDate   DateTime?
 
@@ -96,6 +98,7 @@ model Item {
   planId String
 
   name     String
+  placeId  String?
   notes    String?
   category Category @default(SIGHTSEEING)
 
