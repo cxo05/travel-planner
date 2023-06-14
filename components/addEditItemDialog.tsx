@@ -26,7 +26,6 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
 
   const { control, formState: { errors }, handleSubmit, reset } = useForm<Item>({ defaultValues });
 
-  // Feels a bit hacky, probably a better way to do this
   useEffect(() => {
     if (item) {
       reset(item);

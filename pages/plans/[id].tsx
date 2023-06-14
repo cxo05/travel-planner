@@ -8,7 +8,7 @@ import withDragAndDrop, { DragFromOutsideItemArgs, withDragAndDropProps } from '
 import { useRouter } from 'next/router'
 
 import { useCallback, useState } from 'react'
-import { usePlan, useCalendarEvents, CalendarEvent } from '../../lib/swr'
+import { useCalendarEvents, CalendarEvent } from '../../lib/swr'
 import { Category, ScheduledItem } from '@prisma/client'
 import { mutate } from 'swr'
 import EventComponent from '../../components/Calendar/customEvent'
@@ -23,8 +23,6 @@ const PlanPage = () => {
 
   const router = useRouter()
   const { id } = router.query
-
-  const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
 
   const { calendarEvents, isLoading: isLoadingItem, isError: isErrorItem } = useCalendarEvents(id)
 
@@ -115,12 +113,7 @@ const PlanPage = () => {
                 dayLayoutAlgorithm={'no-overlap'}
                 components={{
                   event: EventComponent,
-                  toolbar: (props) => {
-                    let combinedProps = { ...props, plan: plan };
-                    return (<ToolbarComponent
-                      {...combinedProps}
-                    />)
-                  }
+                  toolbar: ToolbarComponent
                 }}
                 eventPropGetter={eventPropGetter}
                 //@ts-ignore

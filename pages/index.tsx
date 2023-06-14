@@ -7,7 +7,7 @@ import { Avatar } from 'primereact/avatar';
 import { AvatarGroup } from 'primereact/avatargroup';
 
 import prisma from '../lib/prisma';
-import { Plan, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { useState, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
 import { PlanWithCollaborators } from '../lib/swr';
@@ -63,7 +63,6 @@ const Home: NextPage<Plans> = ({ plans }) => {
         <>
           <div className="grid auto-rows-fr grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-5">
             <PlanDialog
-              plan={undefined}
               visible={addPlanVisiblePopUp}
               onHide={() => {
                 setAddPlanVisiblePopUp(false)
