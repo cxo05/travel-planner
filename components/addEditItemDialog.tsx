@@ -1,14 +1,15 @@
 import { NextPage } from "next";
 import React, { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { UseFormRegister, UseFormSetValue, useForm } from 'react-hook-form';
 import { Category, Item } from '@prisma/client';
 import { useSWRConfig } from 'swr';
 
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
+import { ProgressSpinner } from 'primereact/progressspinner';
 
-import { Autocomplete, GoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import { Autocomplete, GoogleMap, MarkerF, useGoogleMap, useJsApiLoader } from '@react-google-maps/api';
 
 interface Props {
   planId: string | string[] | undefined
@@ -31,8 +32,6 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
 
   const { register, setValue, handleSubmit, reset } = useForm<Item>({ defaultValues })
 
-  const [map, setMap] = useState<any>(null)
-
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.GOOGLE_API_KEY || '',
@@ -44,60 +43,10 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
     lng: 2.1999917272411134,
   })
 
-
-  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete>()
-
-  const [marker, setMarker] = useState<google.maps.Marker>()
-
   const onLoad = useCallback((map: google.maps.Map) => {
-    // If editing, set to previous address center
-    const bounds = new window.google.maps.LatLngBounds(center);
+    const bounds = new google.maps.LatLngBounds(center);
     map.fitBounds(bounds);
-
-    setMap(map)
   }, [center])
-
-  const onAutocompleteLoad = useCallback((autocomplete: google.maps.places.Autocomplete) => {
-    console.log("Loaded")
-    setAutocomplete(autocomplete)
-  }, [])
-
-  const onMapClick = (e: google.maps.MapMouseEvent) => {
-    let service = new google.maps.places.PlacesService(map);
-    if (!("placeId" in e)) {
-      return
-    }
-
-    service.getDetails({ placeId: e.placeId as string }, (place, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        locationSelected(place!)
-      }
-    })
-  }
-
-  const onPlaceChanged = () => {
-    if (autocomplete != null && autocomplete != undefined) {
-      const place = autocomplete.getPlace();
-      locationSelected(place)
-    } else {
-      alert("Please select a location");
-    }
-  }
-
-  function locationSelected(place: google.maps.places.PlaceResult) {
-    map.setZoom(15);
-    map.setCenter(place.geometry?.location);
-
-    if (marker == undefined) {
-      setMarker(new google.maps.Marker())
-    }
-
-    marker!.setMap(map)
-    marker!.setPosition(place.geometry?.location)
-
-    setMarker(marker)
-    setValue("placeId", place.place_id as string)
-  }
 
   useEffect(() => {
     if (item) {
@@ -110,7 +59,6 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
   const { mutate } = useSWRConfig()
 
   const onSubmit = (newItem: Item) => {
-    console.log(newItem)
     fetch(item ? `/api/item/${item.id}` : `/api/item?planId=${planId}`, {
       body: JSON.stringify({ name: newItem.name, placeId: newItem.placeId, notes: newItem.notes, category: category }),
       headers: {
@@ -139,36 +87,18 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
       <div className="flex flex-column md:flex-row">
         <div className="w-full flex flex-column align-items-s justify-content-center gap-3 py-5">
           <form className="w-full">
-            <GoogleMap
-              mapContainerClassName="w-full h-[600px]"
-              center={center}
-              zoom={10}
-              onLoad={onLoad}
-              onClick={onMapClick}
-              onUnmount={() => setMap(undefined)}
-            >
-              <Autocomplete
-                onLoad={onAutocompleteLoad}
-                onPlaceChanged={onPlaceChanged}
-                options={{
-                  fields: ["name", "place_id", "geometry"]
-                }}
+            {isLoaded ?
+              <GoogleMap
+                mapContainerClassName="w-full h-[600px]"
+                center={center}
+                zoom={10}
+                onLoad={onLoad}
               >
-                <input
-                  type="text"
-                  placeholder="Search"
-                  {...register("name", { required: "Required" })}
-                  className="mt-5 outline-none rounded-md absolute left-1/2 text-ellipsis"
-                  style={{
-                    width: `240px`,
-                    height: `32px`,
-                    padding: `0 12px`,
-                    boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
-                    marginLeft: "-120px"
-                  }}
-                />
-              </Autocomplete>
-            </GoogleMap>
+                <MapContent item={item} register={register} setValue={setValue} />
+              </GoogleMap>
+              :
+              <ProgressSpinner />
+            }
             <div className="field py-3">
               <span className="p-float-label">
                 <InputText
@@ -186,5 +116,110 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
     </Dialog >
   )
 };
+
+interface MapContentProps {
+  item: Item | undefined
+  setValue: UseFormSetValue<Item>
+  register: UseFormRegister<Item>
+}
+
+function MapContent({ item, setValue, register }: MapContentProps) {
+  const map = useGoogleMap()
+  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete>()
+  const [marker, setMarker] = useState<google.maps.Marker>()
+  const [place, setPlace] = useState<google.maps.places.PlaceResult>()
+
+  useEffect(() => {
+    if (!map) return;
+    map.addListener("click", (e: google.maps.MapMouseEvent) => {
+      if (!map) return
+
+      let service = new google.maps.places.PlacesService(map);
+      if (!("placeId" in e)) {
+        return
+      }
+
+      service.getDetails({ placeId: e.placeId as string }, (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          setValue("name", place!.name as string)
+          setPlace(place!)
+        }
+      })
+    })
+  }, [map, setValue]);
+
+  useEffect(() => {
+    if (!map || !place || !marker) return
+
+    map.setZoom(17);
+    map.setCenter(place.geometry!.location!);
+
+    marker.setPosition(place.geometry?.location)
+    marker.setVisible(true)
+
+    console.log(marker.getPosition()?.toString())
+
+    setValue("placeId", place.place_id as string)
+  }, [place, map, marker, setValue])
+
+  useEffect(() => {
+    if (!map) return
+    if (item?.placeId) {
+      let service = new google.maps.places.PlacesService(map);
+      service.getDetails({ placeId: item.placeId }, (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          setPlace(place!)
+        }
+      })
+    }
+  }, [item, map])
+
+  const onPlaceChanged = () => {
+    if (autocomplete != null && autocomplete != undefined) {
+      const place = autocomplete.getPlace();
+      setPlace(place)
+    } else {
+      alert("Please select a location");
+    }
+  }
+
+  return (
+    <>
+      <Autocomplete
+        onLoad={(a) => setAutocomplete(a)}
+        onPlaceChanged={onPlaceChanged}
+        options={{
+          fields: ["name", "place_id", "geometry"]
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Search"
+          {...register("name", { required: "Required" })}
+          className="mt-5 outline-none rounded-md absolute left-1/2 text-ellipsis"
+          style={{
+            width: `240px`,
+            height: `32px`,
+            padding: `0 12px`,
+            boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
+            marginLeft: "-120px"
+          }}
+        />
+      </Autocomplete>
+      <MarkerF
+        onLoad={(m) => {
+          m.setMap(map);
+          setMarker(m);
+        }}
+        position={{
+          lat: 37.772,
+          lng: -122.214
+        }}
+        visible={false}
+      >
+      </MarkerF>
+    </>
+  )
+}
 
 export default AddEditItemDialog;
