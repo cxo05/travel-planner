@@ -99,7 +99,6 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
     setValue("placeId", place.place_id as string)
   }
 
-  // Feels a bit hacky, probably a better way to do this
   useEffect(() => {
     if (item) {
       reset(item);

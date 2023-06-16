@@ -5,8 +5,9 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { useRef, useState } from 'react';
 import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
 
-import EditPlanDialog from '../editPlanDialog'
-import { Plan } from '@prisma/client';
+import PlanDialog from '../planDialog'
+import { usePlan } from '../../lib/swr';
+import { useRouter } from 'next/router';
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   return viewNames.map((name: any) => (
@@ -21,23 +22,22 @@ const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   ))
 }
 
-interface CustomToolbarProps extends ToolbarProps {
-  plan: Plan | undefined
-}
-
-
 const ToolbarComponent = ({
   label,
   localizer: { messages },
   onNavigate,
   onView,
   view,
-  views,
-  plan,
-}: CustomToolbarProps
+  views
+}: ToolbarProps
 ) => {
   const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
-  const menuRight = useRef<Menu>(null); 
+  const menuRight = useRef<Menu>(null);
+
+  const router = useRouter()
+  const { id } = router.query
+
+  const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
 
   const items = [
     {
@@ -47,7 +47,7 @@ const ToolbarComponent = ({
           label: 'Edit',
           icon: 'pi pi-pencil',
           command: () => {
-            setVisibleEditPopUp(true);
+            setVisibleEditPopUp(true)
           }
         },
         {
@@ -77,7 +77,7 @@ const ToolbarComponent = ({
 
   return (
     <div className="rbc-toolbar">
-      <EditPlanDialog plan={plan} visible={visibleEditPopUp} onHide={() => setVisibleEditPopUp(false)}></EditPlanDialog>
+      <PlanDialog plan={plan} visible={visibleEditPopUp} onHide={() => setVisibleEditPopUp(false)}></PlanDialog>
       <span className="rbc-btn-group">
         <ViewNamesGroup
           view={view}
