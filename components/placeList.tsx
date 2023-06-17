@@ -1,7 +1,6 @@
 import PlaceCard from './placeCard';
 import AddEditItemDialog from './addEditItemDialog';
 
-import { TabView, TabPanel } from 'primereact/tabview';
 import { SelectButton } from 'primereact/selectbutton';
 import { useState } from 'react';
 import { Button } from 'primereact/button';
@@ -12,17 +11,17 @@ import { NextPage } from 'next';
 
 interface Props {
   handleDragStart: (item: CalendarEvent) => void
+  handleClose: () => void
 }
 
 const PlaceList: NextPage<Props> = (props) => {
-  const { handleDragStart } = props;
+  const { handleDragStart, handleClose } = props;
 
   const router = useRouter()
   const { id } = router.query
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeCat, setActiveCat] = useState<Category | null>(null);
   const [visiblePopUp, setVisiblePopUp] = useState(false);
-  const [displayHeader, setDisplayHeader] = useState<Category>('SIGHTSEEING');
 
   const [editItem, setEditItem] = useState<Item | undefined>(undefined);
 
@@ -32,30 +31,15 @@ const PlaceList: NextPage<Props> = (props) => {
   if (isError) return <div>An error occured</div>
 
   const options = [
-    { label: 'Sightseeing', value: 0 },
-    { label: 'Food', value: 1 },
-    { label: 'Activities', value: 2 },
-    { label: 'Others', value: 3 },
+    { label: 'All', value: null },
+    { label: 'Sightseeing', value: Category.SIGHTSEEING },
+    { label: 'Food', value: Category.FOOD },
+    { label: 'Activities', value: Category.ACTIVITIES },
+    { label: 'Others', value: Category.OTHERS },
   ];
 
   const handleAddPopUp = () => {
-    let category: Category = 'SIGHTSEEING';
-    switch (activeIndex) {
-      case 0:
-        category = "SIGHTSEEING";
-        break;
-      case 1:
-        category = "FOOD";
-        break;
-      case 2:
-        category = "ACTIVITIES";
-        break;
-      case 3:
-        category = "OTHERS";
-        break;
-    }
     setEditItem(undefined);
-    setDisplayHeader(category);
     setVisiblePopUp(true);
   }
 
@@ -65,53 +49,24 @@ const PlaceList: NextPage<Props> = (props) => {
   }
 
   return (
-    <div className='pt-4 select-none'>
-      <AddEditItemDialog planId={id} item={editItem} visible={visiblePopUp} category={displayHeader} onHide={() => setVisiblePopUp(false)}></AddEditItemDialog>
+    <div className='py-4 select-none'>
+      <AddEditItemDialog planId={id} item={editItem} visible={visiblePopUp} onHide={() => setVisiblePopUp(false)}></AddEditItemDialog>
       <div className="flex items-center justify-center mx-5">
         <p className='text-lg font-bold'>Places</p>
         <div className='flex-grow'></div>
-        <SelectButton value={activeIndex} options={options} unselectable={false} onChange={(e) => setActiveIndex(e.value)}></SelectButton>
+        <SelectButton value={activeCat} options={options} unselectable={false} onChange={(e) => setActiveCat(e.value)}></SelectButton>
+        <Button icon="pi pi-plus" rounded className='ml-2' onClick={() => handleAddPopUp()}></Button>
         <div className='flex-grow'></div>
-        <Button icon="pi pi-plus" className="p-button-rounded" onClick={() => handleAddPopUp()}></Button>
+        <Button icon="pi pi-times" rounded text severity="secondary" onClick={handleClose}></Button>
       </div>
-      <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
-        <TabPanel header="Sightseeing">
-          <div className="grid grid-cols-4 gap-4">
-            {items != undefined && items?.filter((obj) => {
-              return obj.category == "SIGHTSEEING"
-            }).map((obj) => (
-              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
-            ))}
-          </div>
-        </TabPanel>
-        <TabPanel header="Food">
-          <div className="grid grid-cols-4 gap-4">
-            {items != undefined && items?.filter((obj) => {
-              return obj.category == "FOOD"
-            }).map((obj) => (
-              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
-            ))}
-          </div>
-        </TabPanel>
-        <TabPanel header="Activities">
-          <div className="grid grid-cols-4 gap-4">
-            {items != undefined && items?.filter((obj) => {
-              return obj.category == "ACTIVITIES"
-            }).map((obj) => (
-              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
-            ))}
-          </div>
-        </TabPanel>
-        <TabPanel header="Others">
-          <div className="grid grid-cols-4 gap-4">
-            {items != undefined && items?.filter((obj) => {
-              return obj.category == "OTHERS"
-            }).map((obj) => (
-              <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
-            ))}
-          </div>
-        </TabPanel>
-      </TabView>
+      <div id="customScroll" className="flex flex-nowrap overflow-x-auto gap-4 items-stretch p-4">
+        {items != undefined && items?.filter((obj) => {
+          if (!activeCat) return true
+          return obj.category == activeCat
+        }).map((obj) => (
+          <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
+        ))}
+      </div>
     </div>
   );
 };

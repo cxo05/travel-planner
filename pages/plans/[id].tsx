@@ -7,12 +7,15 @@ import withDragAndDrop, { DragFromOutsideItemArgs, withDragAndDropProps } from '
 
 import { useRouter } from 'next/router'
 
+import { Sidebar } from 'primereact/sidebar';
+
 import { useCallback, useState } from 'react'
 import { useCalendarEvents, CalendarEvent } from '../../lib/swr'
 import { Category, ScheduledItem } from '@prisma/client'
 import { mutate } from 'swr'
 import EventComponent from '../../components/Calendar/customEvent'
 import ToolbarComponent from '../../components/Calendar/customToolbar'
+import { Button } from 'primereact/button'
 
 const djLocalizer = dayjsLocalizer(dayjs)
 
@@ -23,6 +26,8 @@ const PlanPage = () => {
 
   const router = useRouter()
   const { id } = router.query
+
+  const [sidebarVisible, setSidebarVisible] = useState(true)
 
   const { calendarEvents, isLoading: isLoadingItem, isError: isErrorItem } = useCalendarEvents(id)
 
@@ -91,10 +96,8 @@ const PlanPage = () => {
   if (isLoadingItem) return <div>Loading ...</div>
   if (isErrorItem) return <div>An error occured</div>
 
-  const placeListHeight = '275px'
-
   return (
-    <main style={{ height: `calc(800px + ${placeListHeight})` }}>
+    <main>
       <div className='h-full'>
         {session && session.user ? (
           <>
@@ -125,15 +128,23 @@ const PlanPage = () => {
               />
             </div>
             <div
-              className="container fixed bottom-0 z-40 bg-white"
-              style={{ height: `${placeListHeight}` }}
+              className="container fixed bottom-0 z-40 bg-white p-5 flex justify-center"
+            >
+              <Button icon="pi pi-arrow-up" rounded severity="success" onClick={() => setSidebarVisible(true)}></Button>
+            </div>
+            <Sidebar
+              visible={sidebarVisible}
+              position='bottom'
+              maskStyle={{ 'animation': 'none' }}
+              style={{ 'height': 'fit-content' }}
+              onHide={() => setSidebarVisible(false)}
+              showCloseIcon={false}
+              dismissable={false}
               onDragOver={(e) => { e.stopPropagation() }}
               onDrop={(e) => { e.stopPropagation() }}
             >
-              <div style={{ boxShadow: "0 -5px 5px -5px #333" }}>
-                <PlaceList handleDragStart={handleDragStart}></PlaceList>
-              </div>
-            </div>
+              <PlaceList handleDragStart={handleDragStart} handleClose={() => setSidebarVisible(false)}></PlaceList>
+            </Sidebar>
           </>
         ) : (
           <p>You need to sign in to save your progress</p>

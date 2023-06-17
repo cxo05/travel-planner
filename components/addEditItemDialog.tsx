@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import React, { useCallback, useEffect, useState } from 'react';
-import { UseFormRegister, UseFormSetValue, useForm } from 'react-hook-form';
+import { Controller, UseFormRegister, UseFormSetValue, useForm } from 'react-hook-form';
 import { Category, Item } from '@prisma/client';
 import { useSWRConfig } from 'swr';
 
@@ -8,16 +8,24 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import { Dropdown } from 'primereact/dropdown';
 
 import { Autocomplete, GoogleMap, MarkerF, useGoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import { classNames } from "primereact/utils";
 
 interface Props {
   planId: string | string[] | undefined
   item: Item | undefined
   visible: boolean
-  category: Category
   onHide: () => void
 }
+
+const categories = [
+  { name: 'Sightseeing', value: Category.SIGHTSEEING },
+  { name: 'Food', value: Category.FOOD },
+  { name: 'Activities', value: Category.ACTIVITIES },
+  { name: 'Others', value: Category.OTHERS },
+];
 
 const defaultValues = {
   name: '',
@@ -28,9 +36,9 @@ const defaultValues = {
 const libraries: ("drawing" | "geometry" | "localContext" | "places" | "visualization")[] = ["places"]
 
 const AddEditItemDialog: NextPage<Props> = (props) => {
-  const { planId, item, visible, category, onHide } = props
+  const { planId, item, visible, onHide } = props
 
-  const { register, setValue, handleSubmit, reset } = useForm<Item>({ defaultValues })
+  const { control, register, setValue, handleSubmit, reset } = useForm<Item>({ defaultValues })
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -60,7 +68,7 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
 
   const onSubmit = (newItem: Item) => {
     fetch(item ? `/api/item/${item.id}` : `/api/item?planId=${planId}`, {
-      body: JSON.stringify({ name: newItem.name, placeId: newItem.placeId, notes: newItem.notes, category: category }),
+      body: JSON.stringify({ name: newItem.name, placeId: newItem.placeId, notes: newItem.notes, category: newItem.category }),
       headers: {
         'Content-Type': 'application/json'
       },
@@ -83,9 +91,9 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
   }
 
   return (
-    <Dialog header={category} visible={visible} style={{ width: '80vw' }} footer={renderFooter} onHide={() => { onHide() }}>
+    <Dialog header="Find a place to add" visible={visible} style={{ width: '80vw' }} footer={renderFooter} onHide={() => { onHide() }}>
       <div className="flex flex-column md:flex-row">
-        <div className="w-full flex flex-column align-items-s justify-content-center gap-3 py-5">
+        <div className="w-full flex flex-column align-items-s justify-content-center gap-3">
           <form className="w-full">
             {isLoaded ?
               <GoogleMap
@@ -109,6 +117,25 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
                 />
                 <label htmlFor="notes">Notes</label>
               </span>
+            </div>
+            <div className="field py-3">
+              <Controller
+                name="category"
+                control={control}
+                rules={{ required: 'Category is required.' }}
+                render={({ field, fieldState }) => (
+                  <Dropdown
+                    id={field.name}
+                    value={field.value}
+                    optionLabel="name"
+                    placeholder="Select a Category"
+                    options={categories}
+                    focusInputRef={field.ref}
+                    onChange={(e) => field.onChange(e.value)}
+                    className={classNames({ 'p-invalid': fieldState.error })}
+                  />
+                )}
+              />
             </div>
           </form>
         </div>

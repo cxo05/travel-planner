@@ -39,6 +39,7 @@ const PlaceCard: NextPage<Props> = (props) => {
     <>
       <div
         draggable="true"
+        className="lg:basis-1/5 md:basis-1/4 grow-0 shrink-0"
         onDragStart={(event: DragEvent) => {
           let color = 'bg-lime-500'
           switch (item.category) {
@@ -71,8 +72,11 @@ const PlaceCard: NextPage<Props> = (props) => {
           handleDragStart(scheduledItem)
         }}
       >
-        {/* <Card title={title} footer={footer} style={{ opacity: isDragging ? 0.5 : 1 }}> */}
-        <Card title={title} footer={footer}>
+        <Card
+          title={title}
+          footer={footer}
+          className="h-full"
+        >
           <p >{item.notes}</p>
         </Card>
       </div>
