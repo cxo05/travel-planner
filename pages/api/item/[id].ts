@@ -5,7 +5,7 @@ import prisma from '../../../lib/prisma'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const itemId = req.query.id;
 
-  const { name, notes, category } = req.body
+  const { name, placeId, notes, category } = req.body
 
   switch (req.method) {
     case 'GET':
@@ -23,6 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
         data: {
           name: name,
+          placeId: placeId,
           notes: notes,
           category: category,
         },
