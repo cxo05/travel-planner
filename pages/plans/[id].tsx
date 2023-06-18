@@ -40,9 +40,6 @@ const PlanPage = () => {
     ({ event, start, end }) => {
       fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
         body: JSON.stringify({ startDate: start, endDate: end }),
-        headers: {
-          'Content-Type': 'application/json'
-        },
         method: 'PUT'
       }).then((res) => {
         return res.json() as Promise<ScheduledItem>
@@ -140,6 +137,7 @@ const PlanPage = () => {
               onHide={() => setSidebarVisible(false)}
               showCloseIcon={false}
               dismissable={false}
+              modal={false}
               onDragOver={(e) => { e.stopPropagation() }}
               onDrop={(e) => { e.stopPropagation() }}
             >
