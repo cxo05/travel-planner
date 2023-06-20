@@ -72,7 +72,7 @@ model Plan {
 }
 
 model UsersOnPlan {
-  plan      Plan    @relation(fields: [planId], references: [id])
+  plan      Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
   planId    String
   user      User    @relation(fields: [userId], references: [id])
   userId    String
@@ -89,8 +89,8 @@ model ScheduledItem {
   startDate DateTime
   endDate   DateTime
 
-  Item Item @relation(fields: [ItemId], references: [id])
-  Plan Plan @relation(fields: [planId], references: [id])
+  Item Item @relation(fields: [ItemId], references: [id], onDelete: Cascade)
+  Plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
 }
 
 model Item {
@@ -102,7 +102,7 @@ model Item {
   notes    String?
   category Category @default(SIGHTSEEING)
 
-  plan          Plan            @relation(fields: [planId], references: [id])
+  plan          Plan            @relation(fields: [planId], references: [id], onDelete: Cascade)
   ScheduledItem ScheduledItem[]
 }
 

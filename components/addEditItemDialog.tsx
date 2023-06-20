@@ -166,7 +166,7 @@ function MapContent({ item, setValue, register }: MapContentProps) {
         return
       }
 
-      service.getDetails({ placeId: e.placeId as string }, (place, status) => {
+      service.getDetails({ placeId: e.placeId as string, fields: ["name", "place_id", "geometry"] }, (place, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK) {
           setValue("name", place!.name as string)
           setPlace(place!)
@@ -183,8 +183,6 @@ function MapContent({ item, setValue, register }: MapContentProps) {
 
     marker.setPosition(place.geometry?.location)
     marker.setVisible(true)
-
-    console.log(marker.getPosition()?.toString())
 
     setValue("placeId", place.place_id as string)
   }, [place, map, marker, setValue])

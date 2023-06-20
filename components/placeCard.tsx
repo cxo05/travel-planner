@@ -6,6 +6,7 @@ import { mutate } from "swr";
 import { CalendarEvent } from "../lib/swr";
 import { DragEvent } from "react";
 import { createRoot } from 'react-dom/client';
+import { confirmDialog } from "primereact/confirmdialog";
 
 interface Props {
   item: Item
@@ -21,13 +22,22 @@ const PlaceCard: NextPage<Props> = (props) => {
   </div>
 
   async function handleDeleteItem() {
-    fetch(`/api/item/${item.id}`, {
-      method: 'DELETE'
-    }).then((res) => {
-      return res.json() as Promise<Item>
-    }).then(() => {
-      mutate(`/api/item?planId=${item.planId}`);
-    })
+    confirmDialog({
+      message: 'Do you want to delete this item? All scheduled events will be deleted.',
+      header: 'Delete Confirmation',
+      icon: 'pi pi-info-circle',
+      acceptClassName: 'p-button-danger',
+      accept: () => {
+        fetch(`/api/item/${item.id}`, {
+          method: 'DELETE'
+        }).then((res) => {
+          return res.json() as Promise<Item>
+        }).then(() => {
+          mutate(`/api/item?planId=${item.planId}`);
+          mutate(`/api/scheduledItem?planId=${item.planId}`);
+        })
+      },
+    });
   }
 
   const title = <div className='flex justify-between'>
