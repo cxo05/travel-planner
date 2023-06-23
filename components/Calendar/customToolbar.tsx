@@ -8,6 +8,7 @@ import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
 import PlanDialog from '../planDialog'
 import { usePlan } from '../../lib/swr';
 import { useRouter } from 'next/router';
+import { MenuItem } from 'primereact/menuitem';
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   return viewNames.map((name: any) => (
@@ -39,20 +40,20 @@ const ToolbarComponent = ({
 
   const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
 
-  const items = [
+  const items: MenuItem[] = [
     {
       label: 'Options',
       items: [
         {
-          label: 'Edit',
+          label: 'Edit Plan',
           icon: 'pi pi-pencil',
           command: () => {
             setVisibleEditPopUp(true)
           }
         },
         {
-          label: 'Delete',
-          icon: 'pi pi-times',
+          label: 'Delete Plan',
+          icon: 'pi pi-trash',
           command: () => {
             confirmDialog({
               message: 'Do you want to delete this plan?',

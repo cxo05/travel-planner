@@ -7,6 +7,8 @@ import "primereact/resources/themes/bootstrap4-light-blue/theme.css";  //theme
 import "primereact/resources/primereact.min.css";                  //core css
 import "primeicons/primeicons.css";
 
+import 'material-icons/iconfont/outlined.css';
+
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss'
 
 import '../styles/calendar.css'

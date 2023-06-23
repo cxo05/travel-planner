@@ -43,7 +43,7 @@ const EventComponent = ({ event }: EventProps<CalendarEvent>) => {
           <i className="pi pi-times text-red-600 font-semibold"></i>
         </div>
       }
-      <span className="material-symbols-outlined px-1">
+      <span className="material-icons-outlined px-1">
         {icon}
       </span>
       <span>{event.title}</span>

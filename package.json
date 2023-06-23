@@ -17,6 +17,7 @@
     "@types/react-dom": "18.0.9",
     "eslint": "^8.41.0",
     "eslint-config-next": "^13.4.4",
+    "material-icons": "^1.13.8",
     "next": "^13.4.1",
     "next-auth": "^4.22.1",
     "primeicons": "^6.0.1",
