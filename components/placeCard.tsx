@@ -1,4 +1,6 @@
 import { NextPage } from "next";
+import Image from 'next/image'
+
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button'
 import { Category, Item } from "@prisma/client";
@@ -16,10 +18,6 @@ interface Props {
 
 const PlaceCard: NextPage<Props> = (props) => {
   const { item, handleEdit, handleDragStart } = props;
-
-  const footer = <div>
-    <Button label="Edit" className="p-button-sm mr-1" onClick={() => handleEdit(item)} />
-  </div>
 
   async function handleDeleteItem() {
     confirmDialog({
@@ -40,9 +38,25 @@ const PlaceCard: NextPage<Props> = (props) => {
     });
   }
 
+  const header = (item.imageUrl ?
+    <div>
+      <Image
+        src={item.imageUrl}
+        style={{ maxHeight: "150px", objectFit: "cover" }}
+        width={500}
+        height={500}
+        alt="Picture of the author">
+      </Image>
+    </div> : <></>
+  )
+
   const title = <div className='flex justify-between'>
-    <p>{item.name}</p>
+    <p className="text-xl">{item.name}</p>
     <Button icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" aria-label="Cancel" onClick={handleDeleteItem} />
+  </div>
+
+  const footer = <div>
+    <Button label="Edit" className="p-button-sm mr-1" onClick={() => handleEdit(item)} />
   </div>
 
   return (
@@ -83,11 +97,14 @@ const PlaceCard: NextPage<Props> = (props) => {
         }}
       >
         <Card
+          header={header}
           title={title}
           footer={footer}
-          className="h-full"
+          className="h-full overflow-hidden"
         >
-          <p >{item.notes}</p>
+          {item.notes ?
+            <p>{item.notes}</p> : <></>
+          }
         </Card>
       </div>
     </>
