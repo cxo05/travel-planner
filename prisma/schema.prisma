@@ -99,6 +99,7 @@ model Item {
 
   name     String
   placeId  String?
+  imageUrl String?
   notes    String?
   category Category @default(SIGHTSEEING)
 
