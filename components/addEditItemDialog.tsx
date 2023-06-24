@@ -68,7 +68,13 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
 
   const onSubmit = (newItem: Item) => {
     fetch(item ? `/api/item/${item.id}` : `/api/item?planId=${planId}`, {
-      body: JSON.stringify({ name: newItem.name, placeId: newItem.placeId, notes: newItem.notes, category: newItem.category }),
+      body: JSON.stringify({
+        name: newItem.name,
+        placeId: newItem.placeId,
+        notes: newItem.notes,
+        category: newItem.category,
+        imageUrl: newItem.imageUrl
+      }),
       headers: {
         'Content-Type': 'application/json'
       },
@@ -166,11 +172,17 @@ function MapContent({ item, setValue, register }: MapContentProps) {
         return
       }
 
-      service.getDetails({ placeId: e.placeId as string, fields: ["name", "place_id", "geometry"] }, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          setValue("name", place!.name as string)
-          setPlace(place!)
+      service.getDetails({
+        placeId: e.placeId as string,
+        fields: ["name", "place_id", "geometry", "photos"]
+      }, (place) => {
+        if (place == null) return
+        setValue("name", place.name as string)
+        if (place.photos) {
+          console.log(place!.photos[0].getUrl())
+          setValue("imageUrl", place!.photos[0].getUrl())
         }
+        setPlace(place!)
       })
     })
   }, [map, setValue]);
@@ -191,13 +203,15 @@ function MapContent({ item, setValue, register }: MapContentProps) {
     if (!map) return
     if (item?.placeId) {
       let service = new google.maps.places.PlacesService(map);
-      service.getDetails({ placeId: item.placeId }, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          setPlace(place!)
+      service.getDetails({ placeId: item.placeId }, (place) => {
+        if (place == null) return
+        setPlace(place)
+        if (place.photos) {
+          setValue("imageUrl", place!.photos[0].getUrl())
         }
       })
     }
-  }, [item, map])
+  }, [item, map, setValue])
 
   const onPlaceChanged = () => {
     if (autocomplete != null && autocomplete != undefined) {
