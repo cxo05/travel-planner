@@ -1,4 +1,4 @@
-import { useSession } from 'next-auth/react'
+import { getSession } from 'next-auth/react'
 import PlaceList from '../../components/placeList'
 
 import dayjs from 'dayjs'
@@ -16,14 +16,13 @@ import { mutate } from 'swr'
 import EventComponent from '../../components/Calendar/customEvent'
 import ToolbarComponent from '../../components/Calendar/customToolbar'
 import { Button } from 'primereact/button'
+import { GetServerSideProps } from 'next'
 
 const djLocalizer = dayjsLocalizer(dayjs)
 
 const DnDCalendar = withDragAndDrop<CalendarEvent>(Calendar)
 
 const PlanPage = () => {
-  const { data: session } = useSession()
-
   const router = useRouter()
   const { id } = router.query
 
@@ -94,62 +93,71 @@ const PlanPage = () => {
   if (isErrorItem) return <div>An error occured</div>
 
   return (
-    <main>
-      <div className='h-full'>
-        {session && session.user ? (
-          <>
-            <div style={{ height: "800px" }}>
-              <DnDCalendar
-                defaultDate={dayjs().toDate()}
-                events={calendarEvents}
-                localizer={djLocalizer}
-                step={60}
-                views={{
-                  month: true,
-                  week: true,
-                  agenda: true
-                }}
-                defaultView={Views.WEEK}
-                dayLayoutAlgorithm={'no-overlap'}
-                components={{
-                  event: EventComponent,
-                  toolbar: ToolbarComponent
-                }}
-                eventPropGetter={eventPropGetter}
-                //@ts-ignore
-                dragFromOutsideItem={dragFromOutsideItem}
-                onDropFromOutside={onDropFromOutside}
-                onEventDrop={onEventDrop}
-                onEventResize={onEventResize}
-                resizable
-              />
-            </div>
-            <div
-              className="container fixed bottom-0 z-40 bg-white p-5 flex justify-center"
-            >
-              <Button icon="pi pi-arrow-up" rounded severity="success" onClick={() => setSidebarVisible(true)}></Button>
-            </div>
-            <Sidebar
-              visible={sidebarVisible}
-              position='bottom'
-              maskStyle={{ 'animation': 'none' }}
-              style={{ 'height': 'fit-content' }}
-              onHide={() => setSidebarVisible(false)}
-              showCloseIcon={false}
-              dismissable={false}
-              modal={false}
-              onDragOver={(e) => { e.stopPropagation() }}
-              onDrop={(e) => { e.stopPropagation() }}
-            >
-              <PlaceList handleDragStart={handleDragStart} handleClose={() => setSidebarVisible(false)}></PlaceList>
-            </Sidebar>
-          </>
-        ) : (
-          <p>You need to sign in to save your progress</p>
-        )}
+    <div className='h-full pt-2'>
+      <div style={{ height: "800px" }}>
+        <DnDCalendar
+          defaultDate={dayjs().toDate()}
+          events={calendarEvents}
+          localizer={djLocalizer}
+          step={60}
+          views={{
+            month: true,
+            week: true,
+            agenda: true
+          }}
+          defaultView={Views.WEEK}
+          dayLayoutAlgorithm={'no-overlap'}
+          components={{
+            event: EventComponent,
+            toolbar: ToolbarComponent
+          }}
+          eventPropGetter={eventPropGetter}
+          //@ts-ignore
+          dragFromOutsideItem={dragFromOutsideItem}
+          onDropFromOutside={onDropFromOutside}
+          onEventDrop={onEventDrop}
+          onEventResize={onEventResize}
+          resizable
+        />
       </div>
-    </main >
+      <div
+        className="container fixed bottom-0 z-40 bg-white p-5 flex justify-center"
+      >
+        <Button icon="pi pi-arrow-up" rounded severity="success" onClick={() => setSidebarVisible(true)}></Button>
+      </div>
+      <Sidebar
+        visible={sidebarVisible}
+        position='bottom'
+        maskStyle={{ 'animation': 'none' }}
+        style={{ 'height': 'fit-content' }}
+        onHide={() => setSidebarVisible(false)}
+        showCloseIcon={false}
+        dismissable={false}
+        modal={false}
+        onDragOver={(e) => { e.stopPropagation() }}
+        onDrop={(e) => { e.stopPropagation() }}
+      >
+        <PlaceList handleDragStart={handleDragStart} handleClose={() => setSidebarVisible(false)}></PlaceList>
+      </Sidebar>
+    </div>
   )
 }
 
 export default PlanPage
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getSession(ctx)
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {}
+  }
+}
