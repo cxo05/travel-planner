@@ -55,13 +55,14 @@ const PlaceCard: NextPage<Props> = (props) => {
 
   const header = (imageUrl != "" &&
     <div>
-      <Image
+      {/* TODO Find out why Image doesnt work on google place photos on production */}
+      <img
         src={imageUrl}
         style={{ maxHeight: "150px", objectFit: "cover" }}
         width={500}
         height={500}
         alt="Picture of the Place">
-      </Image>
+      </img>
     </div>
   )
 
