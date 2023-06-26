@@ -6,7 +6,7 @@ import { Button } from 'primereact/button'
 import { Category, Item } from "@prisma/client";
 import { mutate } from "swr";
 import { CalendarEvent } from "../lib/swr";
-import { DragEvent } from "react";
+import { DragEvent, useEffect, useState } from "react";
 import { createRoot } from 'react-dom/client';
 import { confirmDialog } from "primereact/confirmdialog";
 
@@ -18,6 +18,21 @@ interface Props {
 
 const PlaceCard: NextPage<Props> = (props) => {
   const { item, handleEdit, handleDragStart } = props;
+
+  const [imageUrl, setImageUrl] = useState("")
+
+  useEffect(() => {
+    let service = new google.maps.places.PlacesService(document.createElement('div'));
+
+    service.getDetails({
+      placeId: item.placeId as string,
+      fields: ["photos"]
+    }, (place) => {
+      if (place != null && place.photos) {
+        setImageUrl(place!.photos[0].getUrl())
+      }
+    })
+  }, [item.placeId])
 
   async function handleDeleteItem() {
     confirmDialog({
@@ -38,20 +53,20 @@ const PlaceCard: NextPage<Props> = (props) => {
     });
   }
 
-  const header = (item.imageUrl ?
+  const header = (imageUrl != "" &&
     <div>
       <Image
-        src={item.imageUrl}
+        src={imageUrl}
         style={{ maxHeight: "150px", objectFit: "cover" }}
         width={500}
         height={500}
-        alt="Picture of the author">
+        alt="Picture of the Place">
       </Image>
-    </div> : <></>
+    </div>
   )
 
   const title = <div className='flex justify-between'>
-    <p className="text-xl">{item.name}</p>
+    <p className="text-lg">{item.name}</p>
     <Button icon="pi pi-times" className="p-button-rounded p-button-danger p-button-text" aria-label="Cancel" onClick={handleDeleteItem} />
   </div>
 
@@ -102,9 +117,7 @@ const PlaceCard: NextPage<Props> = (props) => {
           footer={footer}
           className="h-full overflow-hidden"
         >
-          {item.notes ?
-            <p>{item.notes}</p> : <></>
-          }
+          {item.notes && <p>{item.notes}</p>}
         </Card>
       </div>
     </>

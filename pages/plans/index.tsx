@@ -75,7 +75,7 @@ const PlansPage: NextPage<Plans> = ({ plans }) => {
             onClick={() => router.push(`/plans/${plan.id}`)}
           >
             <p>{new Date(plan.startDate).toDateString()}</p>
-            {plan.endDate ? <p>{new Date(plan.endDate).toDateString()}</p> : <></>}
+            {plan.endDate && <p>{new Date(plan.endDate).toDateString()}</p>}
           </Card>
         ))}
         <div className='grid p-card bg-slate-300 hover:bg-slate-400 place-content-center min-h-[130px]' onClick={() => handleNewPlan()}>

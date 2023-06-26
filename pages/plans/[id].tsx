@@ -17,14 +17,23 @@ import EventComponent from '../../components/Calendar/customEvent'
 import ToolbarComponent from '../../components/Calendar/customToolbar'
 import { Button } from 'primereact/button'
 import { GetServerSideProps } from 'next'
+import { useJsApiLoader } from '@react-google-maps/api'
 
 const djLocalizer = dayjsLocalizer(dayjs)
 
 const DnDCalendar = withDragAndDrop<CalendarEvent>(Calendar)
 
+const libraries: ("drawing" | "geometry" | "localContext" | "places" | "visualization")[] = ["places"]
+
 const PlanPage = () => {
   const router = useRouter()
   const { id } = router.query
+
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.GOOGLE_API_KEY || '',
+    libraries: libraries
+  })
 
   const [sidebarVisible, setSidebarVisible] = useState(true)
 
@@ -39,6 +48,9 @@ const PlanPage = () => {
     ({ event, start, end }) => {
       fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
         body: JSON.stringify({ startDate: start, endDate: end }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
         method: 'PUT'
       }).then((res) => {
         return res.json() as Promise<ScheduledItem>

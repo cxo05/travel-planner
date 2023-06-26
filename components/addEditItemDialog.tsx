@@ -40,11 +40,7 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
 
   const { control, register, setValue, handleSubmit, reset } = useForm<Item>({ defaultValues })
 
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: process.env.GOOGLE_API_KEY || '',
-    libraries: libraries
-  })
+
 
   const [center, setCenter] = useState({
     lat: 41.39860674724766,
@@ -101,18 +97,14 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
       <div className="flex flex-column md:flex-row">
         <div className="w-full flex flex-column align-items-s justify-content-center gap-3">
           <form className="w-full">
-            {isLoaded ?
-              <GoogleMap
-                mapContainerClassName="w-full h-[600px]"
-                center={center}
-                zoom={10}
-                onLoad={onLoad}
-              >
-                <MapContent item={item} register={register} setValue={setValue} />
-              </GoogleMap>
-              :
-              <ProgressSpinner />
-            }
+            <GoogleMap
+              mapContainerClassName="w-full h-[600px]"
+              center={center}
+              zoom={10}
+              onLoad={onLoad}
+            >
+              <MapContent item={item} register={register} setValue={setValue} />
+            </GoogleMap>
             <div className="field py-3">
               <span className="p-float-label">
                 <InputText
@@ -174,14 +166,10 @@ function MapContent({ item, setValue, register }: MapContentProps) {
 
       service.getDetails({
         placeId: e.placeId as string,
-        fields: ["name", "place_id", "geometry", "photos"]
+        fields: ["name", "place_id", "geometry"]
       }, (place) => {
         if (place == null) return
         setValue("name", place.name as string)
-        if (place.photos) {
-          console.log(place!.photos[0].getUrl())
-          setValue("imageUrl", place!.photos[0].getUrl())
-        }
         setPlace(place!)
       })
     })
@@ -203,12 +191,12 @@ function MapContent({ item, setValue, register }: MapContentProps) {
     if (!map) return
     if (item?.placeId) {
       let service = new google.maps.places.PlacesService(map);
-      service.getDetails({ placeId: item.placeId }, (place) => {
+      service.getDetails({
+        placeId: item.placeId,
+        fields: ["name", "place_id", "geometry"]
+      }, (place) => {
         if (place == null) return
         setPlace(place)
-        if (place.photos) {
-          setValue("imageUrl", place!.photos[0].getUrl())
-        }
       })
     }
   }, [item, map, setValue])
