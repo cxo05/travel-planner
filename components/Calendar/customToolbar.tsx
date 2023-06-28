@@ -2,7 +2,7 @@ import { Button } from 'primereact/button';
 import { Menu } from 'primereact/menu';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
 
 import PlanDialog from '../planDialog'
@@ -23,14 +23,25 @@ const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   ))
 }
 
+interface CustomToolbarProps extends ToolbarProps {
+  canUndo: boolean
+  undoFunc: () => void
+  canRedo: boolean
+  redoFunc: () => void
+}
+
 const ToolbarComponent = ({
   label,
   localizer: { messages },
   onNavigate,
   onView,
   view,
-  views
-}: ToolbarProps
+  views,
+  canUndo,
+  undoFunc,
+  canRedo,
+  redoFunc
+}: CustomToolbarProps
 ) => {
   const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
   const menuRight = useRef<Menu>(null);
@@ -89,6 +100,19 @@ const ToolbarComponent = ({
       </span>
 
       <span className="rbc-toolbar-label">{label}</span>
+
+      <span className='rbc-btn-group'>
+        <Button
+          label='⟲ Undo'
+          // disabled={!canUndo}
+          onClick={undoFunc}
+        />
+        <Button
+          label='Redo ⟳'
+          // disabled={!canRedo}
+          onClick={redoFunc}
+        />
+      </span>
 
       <span className='rbc-btn-group'>
         <button

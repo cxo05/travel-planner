@@ -18,6 +18,7 @@ import ToolbarComponent from '../../components/Calendar/customToolbar'
 import { Button } from 'primereact/button'
 import { GetServerSideProps } from 'next'
 import { useJsApiLoader } from '@react-google-maps/api'
+import useUndoRedo from '../../lib/useUndoRedo'
 
 const djLocalizer = dayjsLocalizer(dayjs)
 
@@ -39,12 +40,22 @@ const PlanPage = () => {
 
   const { calendarEvents, isLoading: isLoadingItem, isError: isErrorItem } = useCalendarEvents(id)
 
+  const {
+    state,
+    setState,
+    setInitialState,
+    undo,
+    redo,
+    isUndoPossible,
+    isRedoPossible,
+  } = useUndoRedo(null);
+
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent>()
   const dragFromOutsideItem = useCallback(() => draggedEvent, [draggedEvent])
 
   const handleDragStart = (event: CalendarEvent) => { setDraggedEvent(event) }
 
-  const onEventDrop: withDragAndDropProps<CalendarEvent>['onEventDrop'] =
+  const onEventEdit: withDragAndDropProps<CalendarEvent>['onEventDrop'] =
     ({ event, start, end }) => {
       fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
         body: JSON.stringify({ startDate: start, endDate: end }),
@@ -55,21 +66,30 @@ const PlanPage = () => {
       }).then((res) => {
         return res.json() as Promise<ScheduledItem>
       }).then((data) => {
-        mutate(`/api/scheduledItem?planId=${id}`)
-      })
-    }
-
-  const onEventResize: withDragAndDropProps<CalendarEvent>['onEventResize'] =
-    ({ event, start, end }) => {
-      fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
-        body: JSON.stringify({ startDate: start, endDate: end }),
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'PUT'
-      }).then((res) => {
-        return res.json() as Promise<ScheduledItem>
-      }).then((data) => {
+        if (state == null) {
+          setInitialState({
+            input: `/api/scheduledItem/${event.scheduledItemId}`,
+            init: {
+              body: JSON.stringify({ startDate: event.start, endDate: event.end }),
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              method: 'PUT'
+            },
+            mutateString: `/api/scheduledItem?planId=${id}`
+          })
+        }
+        setState({
+          input: `/api/scheduledItem/${event.scheduledItemId}`,
+          init: {
+            body: JSON.stringify({ startDate: start, endDate: end }),
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            method: 'PUT'
+          },
+          mutateString: `/api/scheduledItem?planId=${id}`
+        })
         mutate(`/api/scheduledItem?planId=${id}`)
       })
     }
@@ -85,11 +105,11 @@ const PlanPage = () => {
       }).then((res) => {
         setDraggedEvent(undefined)
         return res.json() as Promise<ScheduledItem>
-      }).then((data) => {
+      }).then((scheduledItem) => {
         mutate(`/api/scheduledItem?planId=${id}`)
       })
     },
-    [draggedEvent, setDraggedEvent, id]
+    [id, draggedEvent?.itemId]
   )
 
   const eventPropGetter = (event: CalendarEvent) => ({
@@ -121,14 +141,22 @@ const PlanPage = () => {
           dayLayoutAlgorithm={'no-overlap'}
           components={{
             event: EventComponent,
-            toolbar: ToolbarComponent
+            toolbar: (props) => (
+              <ToolbarComponent
+                canUndo={isUndoPossible}
+                undoFunc={undo}
+                canRedo={isRedoPossible}
+                redoFunc={redo}
+                {...props}
+              />
+            )
           }}
           eventPropGetter={eventPropGetter}
           //@ts-ignore
           dragFromOutsideItem={dragFromOutsideItem}
           onDropFromOutside={onDropFromOutside}
-          onEventDrop={onEventDrop}
-          onEventResize={onEventResize}
+          onEventDrop={onEventEdit}
+          onEventResize={onEventEdit}
           resizable
         />
       </div>
