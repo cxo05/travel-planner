@@ -18,7 +18,7 @@ import ToolbarComponent from '../../components/Calendar/customToolbar'
 import { Button } from 'primereact/button'
 import { GetServerSideProps } from 'next'
 import { useJsApiLoader } from '@react-google-maps/api'
-import useUndoRedo from '../../lib/useUndoRedo'
+import useUndoRedo, { UndoRedoContext } from '../../lib/useUndoRedo'
 
 const djLocalizer = dayjsLocalizer(dayjs)
 
@@ -127,38 +127,38 @@ const PlanPage = () => {
   return (
     <div className='h-full pt-2'>
       <div style={{ height: "800px" }}>
-        <DnDCalendar
-          defaultDate={dayjs().toDate()}
-          events={calendarEvents}
-          localizer={djLocalizer}
-          step={60}
-          views={{
-            month: true,
-            week: true,
-            agenda: true
-          }}
-          defaultView={Views.WEEK}
-          dayLayoutAlgorithm={'no-overlap'}
-          components={{
-            event: EventComponent,
-            toolbar: (props) => (
-              <ToolbarComponent
-                canUndo={isUndoPossible}
-                undoFunc={undo}
-                canRedo={isRedoPossible}
-                redoFunc={redo}
-                {...props}
-              />
-            )
-          }}
-          eventPropGetter={eventPropGetter}
-          //@ts-ignore
-          dragFromOutsideItem={dragFromOutsideItem}
-          onDropFromOutside={onDropFromOutside}
-          onEventDrop={onEventEdit}
-          onEventResize={onEventEdit}
-          resizable
-        />
+        <UndoRedoContext.Provider value={{ isUndoPossible, isRedoPossible }}>
+          <DnDCalendar
+            defaultDate={dayjs().toDate()}
+            events={calendarEvents}
+            localizer={djLocalizer}
+            step={60}
+            views={{
+              month: true,
+              week: true,
+              agenda: true
+            }}
+            defaultView={Views.WEEK}
+            dayLayoutAlgorithm={'no-overlap'}
+            components={{
+              event: EventComponent,
+              toolbar: (props) => (
+                <ToolbarComponent
+                  undoFunc={undo}
+                  redoFunc={redo}
+                  {...props}
+                />
+              )
+            }}
+            eventPropGetter={eventPropGetter}
+            //@ts-ignore
+            dragFromOutsideItem={dragFromOutsideItem}
+            onDropFromOutside={onDropFromOutside}
+            onEventDrop={onEventEdit}
+            onEventResize={onEventEdit}
+            resizable
+          />
+        </UndoRedoContext.Provider>
       </div>
       <div
         className="container fixed bottom-0 z-40 bg-white p-5 flex justify-center"

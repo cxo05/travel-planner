@@ -1,4 +1,4 @@
-import { Reducer, useReducer } from "react";
+import { Reducer, createContext, useReducer } from "react";
 import { mutate } from "swr";
 
 export interface FetchParams {
@@ -95,15 +95,18 @@ const useUndoRedo = (initialState: any) => {
 
   const { past, present, future } = state;
 
-  const setState = (newState: any) => dispatch({ type: ReducerActionType.SET_STATE, payload: newState });
+  const setState = (newState: any) => {
+    dispatch({ type: ReducerActionType.SET_STATE, payload: newState });
+  }
+
+  const setInitialState = (newState: any) => {
+    dispatch({ type: ReducerActionType.INITIALIZE, payload: newState })
+  }
+
   const undo = () => dispatch({ type: ReducerActionType.UNDO });
   const redo = () => dispatch({ type: ReducerActionType.REDO });
   const isUndoPossible = past && past.length > 0;
   const isRedoPossible = future && future.length > 0;
-
-  const setInitialState = (state: any) => {
-    dispatch({ type: ReducerActionType.INITIALIZE, payload: state })
-  }
 
   return {
     state: present,
@@ -117,3 +120,5 @@ const useUndoRedo = (initialState: any) => {
 };
 
 export default useUndoRedo;
+
+export const UndoRedoContext = createContext({ isUndoPossible: false, isRedoPossible: false })

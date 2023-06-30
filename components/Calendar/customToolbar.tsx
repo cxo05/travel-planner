@@ -2,13 +2,14 @@ import { Button } from 'primereact/button';
 import { Menu } from 'primereact/menu';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
 
 import PlanDialog from '../planDialog'
 import { usePlan } from '../../lib/swr';
 import { useRouter } from 'next/router';
 import { MenuItem } from 'primereact/menuitem';
+import { UndoRedoContext } from '../../lib/useUndoRedo';
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   return viewNames.map((name: any) => (
@@ -24,9 +25,7 @@ const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
 }
 
 interface CustomToolbarProps extends ToolbarProps {
-  canUndo: boolean
   undoFunc: () => void
-  canRedo: boolean
   redoFunc: () => void
 }
 
@@ -37,13 +36,13 @@ const ToolbarComponent = ({
   onView,
   view,
   views,
-  canUndo,
   undoFunc,
-  canRedo,
   redoFunc
 }: CustomToolbarProps
 ) => {
   const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
+  const { isUndoPossible, isRedoPossible } = useContext(UndoRedoContext)
+
   const menuRight = useRef<Menu>(null);
 
   const router = useRouter()
@@ -104,12 +103,12 @@ const ToolbarComponent = ({
       <span className='rbc-btn-group'>
         <Button
           label='⟲ Undo'
-          // disabled={!canUndo}
+          disabled={!isUndoPossible}
           onClick={undoFunc}
         />
         <Button
           label='Redo ⟳'
-          // disabled={!canRedo}
+          disabled={!isRedoPossible}
           onClick={redoFunc}
         />
       </span>
