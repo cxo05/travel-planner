@@ -53,7 +53,6 @@ const PlanPage = () => {
   } = useCustomReducer(null);
 
   useEffect(() => {
-    console.log(state)
     if (!isInitialized || state == null) return
     fetch(state.input, state.init).then((res) => {
       if (!res.ok) {
@@ -139,13 +138,7 @@ const PlanPage = () => {
             dayLayoutAlgorithm={'no-overlap'}
             components={{
               event: EventComponent,
-              toolbar: (props) => (
-                <ToolbarComponent
-                  undoFunc={undo}
-                  redoFunc={redo}
-                  {...props}
-                />
-              )
+              toolbar: ToolbarComponent
             }}
             eventPropGetter={eventPropGetter}
             //@ts-ignore

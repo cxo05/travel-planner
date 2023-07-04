@@ -24,21 +24,14 @@ const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   ))
 }
 
-interface CustomToolbarProps extends ToolbarProps {
-  undoFunc: () => void
-  redoFunc: () => void
-}
-
 const ToolbarComponent = ({
   label,
   localizer: { messages },
   onNavigate,
   onView,
   view,
-  views,
-  undoFunc,
-  redoFunc
-}: CustomToolbarProps
+  views
+}: ToolbarProps
 ) => {
   const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
   const { undo, redo, isUndoPossible, isRedoPossible } = useUndoRedo()
@@ -104,12 +97,12 @@ const ToolbarComponent = ({
         <Button
           label='⟲ Undo'
           disabled={!isUndoPossible}
-          onClick={undoFunc}
+          onClick={undo}
         />
         <Button
           label='Redo ⟳'
           disabled={!isRedoPossible}
-          onClick={redoFunc}
+          onClick={redo}
         />
       </span>
 

@@ -34,8 +34,6 @@ export type ReducerAction = UndoRedoAction | SetStateAction
 const undoRedoReducer: Reducer<UndoRedo, ReducerAction> = (state, action) => {
   const { past, present, future } = state;
 
-  console.log(ReducerActionType[action.type])
-
   switch (action.type) {
     case ReducerActionType.RESET:
       return {
@@ -50,54 +48,34 @@ const undoRedoReducer: Reducer<UndoRedo, ReducerAction> = (state, action) => {
         future: []
       };
     case ReducerActionType.SET_STATE:
-      if (present == null) {
-        return state
-      }
-
       return {
-        past: [...past, present],
+        past: [...past, present as FetchParams],
         present: action.payload,
         future: []
       };
     case ReducerActionType.UNDO:
-      if (past.length == 0 || present == null) {
+      if (past.length == 0) {
         return state
       }
 
       const previous: FetchParams = past[past.length - 1]
       const newPast = past.slice(0, past.length - 1)
 
-      // fetch(previous.input, previous.init).then((res) => {
-      //   if (!res.ok) {
-      //     console.log(previous)
-      //     throw Error(res.statusText)
-      //   }
-      //   mutate(previous.mutateString)
-      // })
-
       return {
         past: newPast,
         present: previous,
-        future: [present, ...future]
+        future: [present as FetchParams, ...future]
       };
     case ReducerActionType.REDO:
-      if (future.length == 0 || present == null) {
+      if (future.length == 0) {
         return state
       }
 
       const next: FetchParams = future[0]
       const newFuture = future.slice(1)
 
-      // fetch(next.input, next.init).then((res) => {
-      //   if (!res.ok) {
-      //     console.log(next)
-      //     throw Error(res.statusText)
-      //   }
-      //   mutate(next.mutateString)
-      // })
-
       return {
-        past: [...past, present],
+        past: [...past, present as FetchParams],
         present: next,
         future: newFuture
       };
