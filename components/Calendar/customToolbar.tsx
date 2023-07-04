@@ -2,14 +2,14 @@ import { Button } from 'primereact/button';
 import { Menu } from 'primereact/menu';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
-import { useContext, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
 
 import PlanDialog from '../planDialog'
 import { usePlan } from '../../lib/swr';
 import { useRouter } from 'next/router';
 import { MenuItem } from 'primereact/menuitem';
-import { UndoRedoContext } from '../../lib/useUndoRedo';
+import { useUndoRedo } from '../../lib/useUndoRedo';
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   return viewNames.map((name: any) => (
@@ -41,7 +41,7 @@ const ToolbarComponent = ({
 }: CustomToolbarProps
 ) => {
   const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
-  const { isUndoPossible, isRedoPossible } = useContext(UndoRedoContext)
+  const { undo, redo, isUndoPossible, isRedoPossible } = useUndoRedo()
 
   const menuRight = useRef<Menu>(null);
 
