@@ -3,19 +3,11 @@ import { CalendarEvent } from "../../lib/swr";
 import { useState } from "react";
 import { Category } from "@prisma/client";
 import { mutate } from "swr";
-
-const deleteEvent = (event: CalendarEvent) => {
-  fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
-    method: 'DELETE'
-  }).then((res) => {
-    return res.json()
-  }).then((data) => {
-    mutate(`/api/scheduledItem?planId=${event.planId}`)
-  })
-}
+import { useUndoRedo } from "../../lib/useUndoRedo";
 
 const EventComponent = ({ event }: EventProps<CalendarEvent>) => {
   const [displayDelete, setDisplayDelete] = useState(false)
+
   let icon;
   switch (event.category) {
     case Category.SIGHTSEEING:
@@ -27,6 +19,19 @@ const EventComponent = ({ event }: EventProps<CalendarEvent>) => {
     case Category.ACTIVITIES:
       // Maybe an icon
       break;
+  }
+
+  const { reset } = useUndoRedo()
+
+  const deleteEvent = (event: CalendarEvent) => {
+    fetch(`/api/scheduledItem/${event.scheduledItemId}`, {
+      method: 'DELETE'
+    }).then((res) => {
+      return res.json()
+    }).then((data) => {
+      reset()
+      mutate(`/api/scheduledItem?planId=${event.planId}`)
+    })
   }
 
   return (

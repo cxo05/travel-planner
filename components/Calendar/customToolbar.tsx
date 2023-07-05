@@ -9,6 +9,7 @@ import PlanDialog from '../planDialog'
 import { usePlan } from '../../lib/swr';
 import { useRouter } from 'next/router';
 import { MenuItem } from 'primereact/menuitem';
+import { useUndoRedo } from '../../lib/useUndoRedo';
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   return viewNames.map((name: any) => (
@@ -33,6 +34,8 @@ const ToolbarComponent = ({
 }: ToolbarProps
 ) => {
   const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
+  const { undo, redo, isUndoPossible, isRedoPossible } = useUndoRedo()
+
   const menuRight = useRef<Menu>(null);
 
   const router = useRouter()
@@ -89,6 +92,19 @@ const ToolbarComponent = ({
       </span>
 
       <span className="rbc-toolbar-label">{label}</span>
+
+      <span className='rbc-btn-group'>
+        <Button
+          label='⟲ Undo'
+          disabled={!isUndoPossible}
+          onClick={undo}
+        />
+        <Button
+          label='Redo ⟳'
+          disabled={!isRedoPossible}
+          onClick={redo}
+        />
+      </span>
 
       <span className='rbc-btn-group'>
         <button
