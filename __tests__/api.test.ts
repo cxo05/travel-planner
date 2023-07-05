@@ -41,7 +41,7 @@ describe('/api/user', () => {
       image: ""
     }
 
-    prismaMock.user.create.mockResolvedValue(user)
+    prismaMock.user.findUnique.mockResolvedValue(user)
 
     const { req, res } = createMocks({
       method: 'GET',
@@ -50,12 +50,11 @@ describe('/api/user', () => {
       },
     });
 
-
     await userHandler(req, res);
 
     expect(res._getStatusCode()).toBe(200);
     expect(JSON.parse(res._getData())).toEqual(
-      expect.objectContaining(user),
+      JSON.parse(JSON.stringify(user)),
     );
   });
 });
