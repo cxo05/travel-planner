@@ -8,6 +8,8 @@ import { ToolbarProps, Navigate as navigate } from 'react-big-calendar';
 import PlanDialog from '../planDialog'
 import { usePlan } from '../../lib/swr';
 import { useRouter } from 'next/router';
+import { MenuItem } from 'primereact/menuitem';
+import { useUndoRedo } from '../../lib/useUndoRedo';
 
 const ViewNamesGroup = ({ views: viewNames, view, messages, onView }: any) => {
   return viewNames.map((name: any) => (
@@ -32,6 +34,8 @@ const ToolbarComponent = ({
 }: ToolbarProps
 ) => {
   const [visibleEditPopUp, setVisibleEditPopUp] = useState(false);
+  const { undo, redo, isUndoPossible, isRedoPossible } = useUndoRedo()
+
   const menuRight = useRef<Menu>(null);
 
   const router = useRouter()
@@ -39,20 +43,20 @@ const ToolbarComponent = ({
 
   const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
 
-  const items = [
+  const items: MenuItem[] = [
     {
       label: 'Options',
       items: [
         {
-          label: 'Edit',
+          label: 'Edit Plan',
           icon: 'pi pi-pencil',
           command: () => {
             setVisibleEditPopUp(true)
           }
         },
         {
-          label: 'Delete',
-          icon: 'pi pi-times',
+          label: 'Delete Plan',
+          icon: 'pi pi-trash',
           command: () => {
             confirmDialog({
               message: 'Do you want to delete this plan?',
@@ -88,6 +92,19 @@ const ToolbarComponent = ({
       </span>
 
       <span className="rbc-toolbar-label">{label}</span>
+
+      <span className='rbc-btn-group'>
+        <Button
+          label='⟲ Undo'
+          disabled={!isUndoPossible}
+          onClick={undo}
+        />
+        <Button
+          label='Redo ⟳'
+          disabled={!isRedoPossible}
+          onClick={redo}
+        />
+      </span>
 
       <span className='rbc-btn-group'>
         <button

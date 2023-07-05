@@ -12,10 +12,10 @@ export default function Layout({ children }: Props) {
       <Head>
         <title>Travel Planner</title>
         <meta name="description" content="Travel Planner" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <Navbar />
-      <main className="container mx-auto mt-8">{children}</main>
+      <main className="container mx-auto h-full pt-16">{children}</main>
     </>
   )
 }

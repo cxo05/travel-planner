@@ -55,7 +55,7 @@ const PlaceList: NextPage<Props> = (props) => {
         <p className='text-lg font-bold'>Places</p>
         <div className='flex-grow'></div>
         <SelectButton value={activeCat} options={options} unselectable={false} onChange={(e) => setActiveCat(e.value)}></SelectButton>
-        <Button icon="pi pi-plus" rounded className='ml-2' onClick={() => handleAddPopUp()}></Button>
+        <Button icon="pi pi-plus" label='Place' className='ml-2' onClick={() => handleAddPopUp()}></Button>
         <div className='flex-grow'></div>
         <Button icon="pi pi-times" rounded text severity="secondary" onClick={handleClose}></Button>
       </div>

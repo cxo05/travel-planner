@@ -40,11 +40,7 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
 
   const { control, register, setValue, handleSubmit, reset } = useForm<Item>({ defaultValues })
 
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: process.env.GOOGLE_API_KEY || '',
-    libraries: libraries
-  })
+
 
   const [center, setCenter] = useState({
     lat: 41.39860674724766,
@@ -68,7 +64,13 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
 
   const onSubmit = (newItem: Item) => {
     fetch(item ? `/api/item/${item.id}` : `/api/item?planId=${planId}`, {
-      body: JSON.stringify({ name: newItem.name, placeId: newItem.placeId, notes: newItem.notes, category: newItem.category }),
+      body: JSON.stringify({
+        name: newItem.name,
+        placeId: newItem.placeId,
+        notes: newItem.notes,
+        category: newItem.category,
+        imageUrl: newItem.imageUrl
+      }),
       headers: {
         'Content-Type': 'application/json'
       },
@@ -95,18 +97,14 @@ const AddEditItemDialog: NextPage<Props> = (props) => {
       <div className="flex flex-column md:flex-row">
         <div className="w-full flex flex-column align-items-s justify-content-center gap-3">
           <form className="w-full">
-            {isLoaded ?
-              <GoogleMap
-                mapContainerClassName="w-full h-[600px]"
-                center={center}
-                zoom={10}
-                onLoad={onLoad}
-              >
-                <MapContent item={item} register={register} setValue={setValue} />
-              </GoogleMap>
-              :
-              <ProgressSpinner />
-            }
+            <GoogleMap
+              mapContainerClassName="w-full h-[600px]"
+              center={center}
+              zoom={10}
+              onLoad={onLoad}
+            >
+              <MapContent item={item} register={register} setValue={setValue} />
+            </GoogleMap>
             <div className="field py-3">
               <span className="p-float-label">
                 <InputText
@@ -166,11 +164,13 @@ function MapContent({ item, setValue, register }: MapContentProps) {
         return
       }
 
-      service.getDetails({ placeId: e.placeId as string, fields: ["name", "place_id", "geometry"] }, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          setValue("name", place!.name as string)
-          setPlace(place!)
-        }
+      service.getDetails({
+        placeId: e.placeId as string,
+        fields: ["name", "place_id", "geometry"]
+      }, (place) => {
+        if (place == null) return
+        setValue("name", place.name as string)
+        setPlace(place!)
       })
     })
   }, [map, setValue]);
@@ -191,13 +191,15 @@ function MapContent({ item, setValue, register }: MapContentProps) {
     if (!map) return
     if (item?.placeId) {
       let service = new google.maps.places.PlacesService(map);
-      service.getDetails({ placeId: item.placeId }, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          setPlace(place!)
-        }
+      service.getDetails({
+        placeId: item.placeId,
+        fields: ["name", "place_id", "geometry"]
+      }, (place) => {
+        if (place == null) return
+        setPlace(place)
       })
     }
-  }, [item, map])
+  }, [item, map, setValue])
 
   const onPlaceChanged = () => {
     if (autocomplete != null && autocomplete != undefined) {
