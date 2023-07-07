@@ -10,7 +10,7 @@ const createJestConfig = nextJest({
 const config = {
   clearMocks: true,
   preset: 'ts-jest',
-  testEnvironment: 'jest-environment-jsdom',
+  testEnvironment: 'node',
   setupFilesAfterEnv: ['<rootDir>/singleton.ts']
 }
 
