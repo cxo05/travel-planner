@@ -38,7 +38,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             }
           },
         })
-
         res.json(addPlan);
       } catch (error) {
         res.status(500).json({ error: 'An error occurred while creating new plan' });

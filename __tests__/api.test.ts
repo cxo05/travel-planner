@@ -15,75 +15,84 @@ import scheduledItemsHandler from '../pages/api/scheduledItem/index'
 
 import prisma from '../lib/prisma'
 
-// const testUser = {
-//   id: "test-id",
-//   email: "test-email@gmail.com",
-//   name: "test-name",
-//   emailVerified: new Date(),
-//   image: ""
-// }
+const currDate = new Date()
 
-// beforeAll(async () => {
-//   prismaMock.user.create.mockResolvedValue(testUser)
-// })
+const mockUser = {
+  id: "user-1",
+  email: "mock-user-1@gmail.com",
+  name: "user 1",
+  emailVerified: currDate,
+  image: ""
+}
 
-// afterAll(async () => {
-//   prismaMock.user.delete.mockResolvedValue(testUser)
-// })
-
-describe('/api/user', () => {
-  test('should return a user', async () => {
-    const user = {
-      id: "1",
-      email: "user@gmail.com",
-      name: "user",
-      emailVerified: new Date(),
-      image: ""
+const mockPlan = {
+  id: "plan-1",
+  title: "plan 1",
+  location: "Singapore",
+  startDate: currDate,
+  endDate: null,
+  createdAt: currDate,
+  UsersOnPlan: {
+    create: {
+      userId: mockUser.id,
+      isCreator: true
     }
+  }
+}
 
-    prismaMock.user.findUnique.mockResolvedValue(user)
+jest.mock('next-auth/next', () => ({
+    __esModule: true,
+    default: jest.fn(() => 1),
+    getServerSession: jest.fn().mockResolvedValue({ user: { id: 'user-1' } })
+}));
+
+beforeAll(async () => {
+  prismaMock.user.create.mockResolvedValue(mockUser)
+  prismaMock.plan.create.mockResolvedValue(mockPlan)
+})
+
+afterAll(async () => {
+  prismaMock.user.delete.mockResolvedValue(mockUser)
+  prismaMock.plan.create.mockResolvedValue(mockPlan)
+})
+
+describe('User', () => {
+  test('GET /api/user', async () => {
+    prismaMock.user.findUnique.mockResolvedValue(mockUser)
 
     const { req, res } = createMocks({
       method: 'GET',
       query: {
-        id: '1',
+        id: mockUser.id,
       },
     });
 
     await userHandler(req, res);
 
     expect(res._getStatusCode()).toBe(200);
-    expect(JSON.parse(res._getData())).toEqual(
-      JSON.parse(JSON.stringify(user)),
-    );
+    expect(JSON.parse(res._getData())).toEqual(JSON.parse(JSON.stringify(mockUser)));
   });
 });
 
-// describe('POST /api/plan', () => {
-//   const testPlan = {
-//     title: "Test plan",
-//     location: "Singapore",
-//     startDate: "",
-//     endDate: "",
-//     UsersOnPlan: {
-//       create: {
-//         userId: "test-id",
-//         isCreator: true
-//       }
-//     }
-//   }
 
-//   test('create test plan', async () => {
-//     const { req, res } = createMocks({
-//       method: 'POST',
-//       query: testPlan,
-//     });
+describe('Plan', () => {
+  test('POST /api/plan', async () => {
+    prismaMock.plan.create.mockResolvedValue(mockPlan)
 
-//     await planHandler(req, res);
+    const { req, res } = createMocks({
+      method: 'POST',
+      url: '/api/plan',
+      body: {
+        title: 'Test plan',
+        location: 'Singapore',
+        startDate: currDate,
+        endDate: null,
+      },
+    });
 
-//     expect(res._getStatusCode()).toBe(200);
-//     expect(JSON.parse(res._getData())).toEqual(
-//       expect.objectContaining(testPlan),
-//     );
-//   });
-// });
+    await plansHandler(req, res); 
+
+    expect(res.statusCode).toBe(200); 
+    expect(JSON.parse(res._getData())).toEqual(JSON.parse(JSON.stringify(mockPlan)));
+  });
+});
