@@ -22,27 +22,35 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         }
       })
-      res.json(getScheduledItem)
+      getScheduledItem ? res.json(getScheduledItem) : res.status(404).end('Scheduled Item Not Found')
       break
     case 'PUT':
-      const updateScheduledItem = await prisma.scheduledItem.update({
-        where: {
-          id: parseInt(String(scheduledItemId)),
-        },
-        data: {
-          startDate: startDate,
-          endDate: endDate,
-        },
-      })
-      res.json(updateScheduledItem)
+      try {
+        const updateScheduledItem = await prisma.scheduledItem.update({
+          where: {
+            id: parseInt(String(scheduledItemId)),
+          },
+          data: {
+            startDate: startDate,
+            endDate: endDate,
+          },
+        })
+        res.json(updateScheduledItem)
+      } catch (error) {
+        res.status(500).end('Error Updating Scheduled Item');
+      }
       break
     case 'DELETE':
-      const deleteScheduledItem = await prisma.scheduledItem.delete({
-        where: {
-          id: parseInt(String(scheduledItemId)),
-        },
-      })
-      res.json(deleteScheduledItem)
+      try {
+        const deleteScheduledItem = await prisma.scheduledItem.delete({
+          where: {
+            id: parseInt(String(scheduledItemId)),
+          },
+        })
+        res.json(deleteScheduledItem)
+      } catch (error) {
+        res.status(500).end('Error Updating Scheduled Item');
+      }
       break
     default:
       res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])

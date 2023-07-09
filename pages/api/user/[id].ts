@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           id: `${id}`,
         },
       })
-      res.json(getUser)
+      getUser ? res.json(getUser) : res.status(404).end('User Not Found');
       break
     default:
       res.setHeader('Allow', ['GET'])
