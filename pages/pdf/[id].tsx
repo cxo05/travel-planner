@@ -2,14 +2,14 @@ import type { GetServerSideProps, NextPage } from 'next'
 import { getSession } from "next-auth/react"
 
 import prisma from '../../lib/prisma';
-import { PlanWithCollaborators } from '../../lib/swr';
+import { PlanWithCollaborators, PlanWithItems } from '../../lib/swr';
 
 import dynamic from 'next/dynamic';
 
 const PDFView = dynamic(() => import('../../lib/pdf'), { ssr: false })
 
 interface Plan {
-  plan: PlanWithCollaborators[]
+  plan: PlanWithItems
 }
 
 const PdfPage: NextPage<Plan> = ({ plan }) => {
