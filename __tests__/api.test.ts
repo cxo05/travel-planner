@@ -14,6 +14,9 @@ import scheduledItemHandler from '../pages/api/scheduledItem/[id]'
 import scheduledItemsHandler from '../pages/api/scheduledItem/index'
 
 import prisma from '../lib/prisma'
+import { Plan } from '@prisma/client';
+import { getServerSession } from 'next-auth/next';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 const currDate = new Date()
 
