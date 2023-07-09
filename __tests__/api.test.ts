@@ -14,6 +14,9 @@ import scheduledItemHandler from '../pages/api/scheduledItem/[id]'
 import scheduledItemsHandler from '../pages/api/scheduledItem/index'
 
 import prisma from '../lib/prisma'
+import { Plan } from '@prisma/client';
+import { getServerSession } from 'next-auth/next';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 // const testUser = {
 //   id: "test-id",
@@ -23,13 +26,7 @@ import prisma from '../lib/prisma'
 //   image: ""
 // }
 
-// beforeAll(async () => {
-//   prismaMock.user.create.mockResolvedValue(testUser)
-// })
-
-// afterAll(async () => {
-//   prismaMock.user.delete.mockResolvedValue(testUser)
-// })
+jest.mock("next-auth/next");
 
 describe('/api/user', () => {
   test('should return a user', async () => {
@@ -59,31 +56,61 @@ describe('/api/user', () => {
   });
 });
 
-// describe('POST /api/plan', () => {
-//   const testPlan = {
-//     title: "Test plan",
-//     location: "Singapore",
-//     startDate: "",
-//     endDate: "",
-//     UsersOnPlan: {
-//       create: {
-//         userId: "test-id",
-//         isCreator: true
-//       }
-//     }
-//   }
+describe('/api/plan', () => {
+  const testPlan: Plan = {
+    id: "1",
+    title: "Test plan",
+    location: "Singapore",
+    createdAt: new Date(),
+    startDate: new Date("2023-08-01"),
+    endDate: new Date("2023-08-20"),
+    // UsersOnPlan: {
+    //   create: {
+    //     userId: "test-id",
+    //     isCreator: true
+    //   }
+    // }
+  }
 
-//   test('create test plan', async () => {
-//     const { req, res } = createMocks({
-//       method: 'POST',
-//       query: testPlan,
-//     });
+  prismaMock.plan.create.mockResolvedValue(testPlan)
 
-//     await planHandler(req, res);
+  test('create test plan', async () => {
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+      method: 'POST',
+      query: {
+        title: "Test plan",
+        location: "Singapore",
+        startDate: new Date("2023-08-01"),
+        endDate: new Date("2023-08-20"),
+        UsersOnPlan: {
+          create: {
+            userId: "test-id",
+            isCreator: true
+          }
+        }
+      },
+    });
 
-//     expect(res._getStatusCode()).toBe(200);
-//     expect(JSON.parse(res._getData())).toEqual(
-//       expect.objectContaining(testPlan),
-//     );
-//   });
-// });
+    await plansHandler(req, res);
+
+    expect(res._getStatusCode()).toBe(200);
+    // expect(JSON.parse(res._getData())).toEqual(
+    //   expect.objectContaining(testPlan),
+    // );
+  });
+
+  // prismaMock.usersOnPlan.findMany.mockResolvedValue(testPlan)
+
+  test('get test plans', async () => {
+    const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+      method: 'GET'
+    });
+
+    await plansHandler(req, res);
+
+    expect(res._getStatusCode()).toBe(200);
+    expect(JSON.parse(res._getData())).toEqual(
+      expect.objectContaining(testPlan),
+    );
+  });
+});
