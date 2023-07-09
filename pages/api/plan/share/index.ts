@@ -8,20 +8,24 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   switch (method) {
     case 'POST':
-      const addUserToPlan = await prisma.user.update({
-        where: {
-          email: email
-        },
-        data: {
-          UsersOnPlan: {
-            create: {
-              planId: planId,
-              isCreator: false
+      try {
+        const addUserToPlan = await prisma.user.update({
+          where: {
+            email: email
+          },
+          data: {
+            UsersOnPlan: {
+              create: {
+                planId: planId,
+                isCreator: false
+              }
             }
-          }
-        },
-      })
-      res.json(addUserToPlan);
+          },
+        })
+        res.json(addUserToPlan);
+      } catch (error) {
+        res.status(500).end('Error Sharing Plan');
+      }
       break
   }
 }
