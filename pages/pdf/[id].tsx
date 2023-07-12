@@ -2,7 +2,7 @@ import type { GetServerSideProps, NextPage } from 'next'
 import { getSession } from "next-auth/react"
 
 import prisma from '../../lib/prisma';
-import { PlanWithCollaborators, PlanWithItems } from '../../lib/swr';
+import { PlanWithItems } from '../../lib/swr';
 
 import dynamic from 'next/dynamic';
 
@@ -37,8 +37,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       id: String(ctx.params.id),
     },
     include: {
-      Items: true,
-      ScheduledItems: true,
+      ScheduledItems: {
+        select: {
+          Item: true,
+          id: true,
+          startDate: true,
+          endDate: true
+        }
+      },
     }
   })
 

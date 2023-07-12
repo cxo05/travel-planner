@@ -58,7 +58,7 @@ const ToolbarComponent = ({
           label: 'Export Pdf',
           icon: 'pi pi-file-export',
           command: () => {
-            router.push(`/pdf/${id}`)
+            window.open(`/pdf/${id}`)
           }
         },
         {

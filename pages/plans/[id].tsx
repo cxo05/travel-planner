@@ -125,10 +125,11 @@ const PlanPage = () => {
       <div style={{ height: "800px" }}>
         <UndoRedoContext.Provider value={{ state, setState, setInitialState, undo, redo, reset, isUndoPossible, isRedoPossible }}>
           <DnDCalendar
-            defaultDate={dayjs().toDate()}
+            defaultDate={calendarEvents ? calendarEvents[0].start : ""}
             events={calendarEvents}
             localizer={djLocalizer}
             step={60}
+            length={60}
             views={{
               month: true,
               week: true,

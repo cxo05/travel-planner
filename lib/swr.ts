@@ -30,8 +30,14 @@ export type PlanWithCollaborators = Prisma.PlanGetPayload<typeof planWithCollabo
 
 const planWithItems = Prisma.validator<Prisma.PlanArgs>()({
   include: {
-    Items: true,
-    ScheduledItems: true,
+    ScheduledItems: {
+      select: {
+        Item: true,
+        id: true,
+        startDate: true,
+        endDate: true
+      }
+    },
   }
 })
 
