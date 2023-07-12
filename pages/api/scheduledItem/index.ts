@@ -32,15 +32,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.json(computeCalendarEvents(getScheduledItems));
       break
     case 'POST':
-      const addScheduledItem = await prisma.scheduledItem.create({
-        data: {
-          planId: String(planId),
-          ItemId: parseInt(itemId),
-          startDate: startDate,
-          endDate: endDate,
-        },
-      })
-      res.json(addScheduledItem);
+      try {
+        const addScheduledItem = await prisma.scheduledItem.create({
+          data: {
+            planId: String(planId),
+            ItemId: parseInt(itemId),
+            startDate: startDate,
+            endDate: endDate,
+          },
+        })
+        res.json(addScheduledItem);
+      } catch (error) {
+        res.status(500).end('Error Updating Scheduled Item');
+      }
       break
   }
 }

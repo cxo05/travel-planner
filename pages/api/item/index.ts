@@ -18,17 +18,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.json(getItems);
       break
     case 'POST':
-      const addItem = await prisma.item.create({
-        data: {
-          planId: String(planId),
-          name: name,
-          placeId: placeId,
-          imageUrl: imageUrl,
-          notes: notes,
-          category: category,
-        },
-      })
-      res.json(addItem);
-      break
+      try {
+        const addItem = await prisma.item.create({
+          data: {
+            planId: String(planId),
+            name: name,
+            placeId: placeId,
+            imageUrl: imageUrl,
+            notes: notes,
+            category: category,
+          },
+        })
+        res.json(addItem);
+    }  catch (error) {
+      res.status(500).end('Error Creating Item');
+    }
+    break
   }
 }

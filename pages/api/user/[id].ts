@@ -14,14 +14,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           id: `${id}`,
         },
       })
-      res.json(getUser)
-      break
-    case 'PUT':
-      // Update or create data in your database
-      //res.status(200).json({ id, name: name || `User ${id}` })
+      getUser ? res.json(getUser) : res.status(404).end('User Not Found');
       break
     default:
-    //res.setHeader('Allow', ['GET', 'PUT'])
-    //res.status(405).end(`Method ${method} Not Allowed`)
+      res.setHeader('Allow', ['GET'])
+      res.status(405).end(`Method ${method} Not Allowed`)
   }
 }

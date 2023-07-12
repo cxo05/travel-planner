@@ -23,21 +23,25 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       res.json(getPlans);
       break
     case 'POST':
-      const addPlan = await prisma.plan.create({
-        data: {
-          title: title,
-          location: location,
-          startDate: startDate,
-          endDate: endDate,
-          UsersOnPlan: {
-            create: {
-              userId: String(session?.user.id),
-              isCreator: true
+      try {
+        const addPlan = await prisma.plan.create({
+          data: {
+            title: title,
+            location: location,
+            startDate: startDate,
+            endDate: endDate,
+            UsersOnPlan: {
+              create: {
+                userId: String(session?.user.id),
+                isCreator: true
+              }
             }
-          }
-        },
-      })
-      res.json(addPlan);
+          },
+        })
+        res.json(addPlan);
+      } catch (error) {
+        res.status(500).end('Error Creating New Plan');
+      }
       break
   }
 }

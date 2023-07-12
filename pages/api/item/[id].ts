@@ -15,30 +15,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           id: parseInt(String(itemId)),
         }
       })
-      res.json(getItem)
+      getItem ? res.json(getItem) : res.status(404).end('Item Not Found')
       break
     case 'PUT':
-      const updateItem = await prisma.item.update({
-        where: {
-          id: parseInt(String(itemId)),
-        },
-        data: {
-          name: name,
-          placeId: placeId,
-          imageUrl: imageUrl,
-          notes: notes,
-          category: category,
-        },
-      })
-      res.json(updateItem)
+      try {
+        const updateItem = await prisma.item.update({
+          where: {
+            id: parseInt(String(itemId)),
+          },
+          data: {
+            name: name,
+            placeId: placeId,
+            imageUrl: imageUrl,
+            notes: notes,
+            category: category,
+          },
+        })
+        res.json(updateItem)
+      } catch (error) {
+        res.status(500).end('Error Updating Item');
+      }
       break
     case 'DELETE':
-      const deleteItem = await prisma.item.delete({
-        where: {
-          id: parseInt(String(itemId)),
-        },
-      })
-      res.json(deleteItem)
+      try {
+        const deleteItem = await prisma.item.delete({
+          where: {
+            id: parseInt(String(itemId)),
+          },
+        })
+        res.json(deleteItem)
+      } catch (error) {
+        res.status(500).end('Error Deleting Item');
+      }
       break
     default:
       res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])
