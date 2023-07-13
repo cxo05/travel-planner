@@ -10,7 +10,7 @@ const Navbar = () => {
 
   const router = useRouter()
 
-  const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(router.query.id)
+  const { plan } = usePlan(router.query.id || '')
 
   return (
     <div className='fixed top-0 w-full'>
