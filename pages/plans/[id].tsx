@@ -10,7 +10,7 @@ import { useRouter } from 'next/router'
 import { Sidebar } from 'primereact/sidebar';
 
 import { useCallback, useEffect, useState } from 'react'
-import { useCalendarEvents, CalendarEvent } from '../../lib/swr'
+import { useCalendarEvents, CalendarEvent, usePlan } from '../../lib/swr'
 import { Category, ScheduledItem } from '@prisma/client'
 import { mutate } from 'swr'
 import EventComponent from '../../components/Calendar/customEvent'
@@ -39,6 +39,7 @@ const PlanPage = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true)
 
   const { calendarEvents, isLoading: isLoadingItem, isError: isErrorItem } = useCalendarEvents(id)
+  const { plan, isLoading: isLoadingPlan, isError: isErrorPlan } = usePlan(id)
 
   const {
     state,
@@ -117,15 +118,15 @@ const PlanPage = () => {
     }),
   })
 
-  if (isLoadingItem) return <div>Loading ...</div>
-  if (isErrorItem) return <div>An error occured</div>
+  if (isLoadingItem || isLoadingPlan) return <div>Loading ...</div>
+  if (isErrorItem || isErrorPlan) return <div>An error occured</div>
 
   return (
     <div className='h-full pt-2'>
       <div style={{ height: "800px" }}>
         <UndoRedoContext.Provider value={{ state, setState, setInitialState, undo, redo, reset, isUndoPossible, isRedoPossible }}>
           <DnDCalendar
-            defaultDate={calendarEvents ? calendarEvents[0].start : ""}
+            defaultDate={plan.startDate}
             events={calendarEvents}
             localizer={djLocalizer}
             step={60}

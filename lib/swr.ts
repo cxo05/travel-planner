@@ -104,8 +104,13 @@ export const useCalendarEvents = (planId: string | string[] | undefined) => {
 export const usePlan = (planId: string | string[] | undefined) => {
   const { data, error, isLoading } = useSWR<Plan>(`/api/plan/${planId}`, fetcher)
 
+  if (data) {
+    data.startDate = dayjs(data?.startDate).toDate()
+    data.endDate = dayjs(data?.endDate).toDate()
+  }
+
   return {
-    plan: data,
+    plan: data as Plan,
     isLoading,
     isError: error
   }
