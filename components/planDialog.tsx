@@ -8,6 +8,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Plan } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useSWRConfig } from 'swr';
+import { Calendar } from 'primereact/calendar';
 
 interface PlanProps {
   plan?: Plan
@@ -17,7 +18,8 @@ interface PlanProps {
 
 const defaultValues = {
   title: '',
-  location: ''
+  location: '',
+  startDate: new Date()
 }
 
 const PlanDialog: NextPage<PlanProps> = (props) => {
@@ -38,7 +40,11 @@ const PlanDialog: NextPage<PlanProps> = (props) => {
   const onSubmit = (newPlan: Plan) => {
     if (plan) {
       fetch(`/api/plan/${plan?.id}`, {
-        body: JSON.stringify({ title: newPlan.title, location: newPlan.location }),
+        body: JSON.stringify({
+          title: newPlan.title,
+          startDate: newPlan.startDate,
+          location: newPlan.location
+        }),
         headers: {
           'Content-Type': 'application/json'
         },
@@ -51,7 +57,12 @@ const PlanDialog: NextPage<PlanProps> = (props) => {
       })
     } else {
       fetch('/api/plan', {
-        body: JSON.stringify({ title: newPlan.title, location: newPlan.location, userId: newPlan.id }),
+        body: JSON.stringify({
+          title: newPlan.title,
+          startDate: newPlan.startDate,
+          location: newPlan.location,
+          userId: newPlan.id
+        }),
         headers: {
           'Content-Type': 'application/json'
         },
@@ -78,19 +89,49 @@ const PlanDialog: NextPage<PlanProps> = (props) => {
       <form className="p-fluid">
         <div className="field py-3">
           <span className="p-float-label">
-            <Controller name="title" control={control} rules={{ required: 'Name is required.' }} render={({ field, fieldState }) => (
-              <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-            )} />
+            <Controller
+              name="title"
+              control={control}
+              rules={{ required: 'Name is required.' }}
+              render={({ field, fieldState }) => (
+                <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
+              )} />
             <label htmlFor="title" className={classNames({ 'p-error': errors.title })}>Plan Name*</label>
           </span>
         </div>
         <div className="field py-3">
           <span className="p-float-label">
-            <Controller name="location" control={control} render={({ field, fieldState }) => (
-              //@ts-ignore
-              <InputText id={field.name} {...field} autoFocus />
-            )} />
-            <label htmlFor="location">Location</label>
+            <Controller
+              name="startDate"
+              control={control}
+              rules={{ required: 'Start date is required.' }}
+              render={({ field, fieldState }) => (
+                <>
+                  <label htmlFor={field.name}>Start Date</label>
+                  <Calendar
+                    selectionMode="single"
+                    inputId={field.name}
+                    value={field.value}
+                    //@ts-ignore
+                    onChange={field.onChange}
+                    dateFormat="dd/mm/yy"
+                    className={classNames({ 'p-invalid': fieldState.error })}
+                  />
+                </>
+              )} />
+          </span>
+        </div>
+        <div className="field py-3">
+          <span className="p-float-label">
+            <Controller
+              name="location"
+              control={control}
+              render={({ field, fieldState }) => (
+                <>
+                  <InputText id={field.name} value={field.value || ''} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} autoFocus />
+                  <label htmlFor={field.name}>Location</label>
+                </>
+              )} />
           </span>
         </div>
       </form>
