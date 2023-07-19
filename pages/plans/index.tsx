@@ -19,8 +19,6 @@ interface Plans {
 }
 
 const PlansPage: NextPage<Plans> = ({ plans }) => {
-  const [loading, setLoading] = useState(false)
-
   const [sharePlanVisiblePopUp, setSharePlanVisiblePopUp] = useState(false);
   const [addPlanVisiblePopUp, setAddPlanVisiblePopUp] = useState(false);
   const [sharePlanId, setSharePlanId] = useState('');
@@ -28,7 +26,6 @@ const PlansPage: NextPage<Plans> = ({ plans }) => {
   const router = useRouter();
 
   async function handleNewPlan() {
-    setLoading(true)
     setAddPlanVisiblePopUp(true)
   }
 
@@ -63,7 +60,6 @@ const PlansPage: NextPage<Plans> = ({ plans }) => {
           visible={addPlanVisiblePopUp}
           onHide={() => {
             setAddPlanVisiblePopUp(false)
-            setLoading(false)
           }}
         ></PlanDialog>
         {plans.map((plan) => (
@@ -79,9 +75,7 @@ const PlansPage: NextPage<Plans> = ({ plans }) => {
           </Card>
         ))}
         <div className='grid p-card bg-slate-300 hover:bg-slate-400 place-content-center min-h-[130px]' onClick={() => handleNewPlan()}>
-          {loading ?
-            <i className='pi pi-spin pi-spinner text-4xl'></i> :
-            <i className='pi pi-plus text-4xl'></i>}
+          <i className='pi pi-plus text-4xl'></i>
         </div>
       </div>
       <SharingDialog planId={sharePlanId} visible={sharePlanVisiblePopUp} onHide={() => setSharePlanVisiblePopUp(false)}></SharingDialog>

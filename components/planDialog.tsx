@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 import { NextPage } from "next";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Plan } from '@prisma/client';
 import { useRouter } from 'next/router';
@@ -28,6 +28,8 @@ const PlanDialog: NextPage<PlanProps> = (props) => {
   const { control, formState: { errors }, handleSubmit, reset } = useForm<Plan>({ defaultValues });
   const { mutate } = useSWRConfig()
   const router = useRouter();
+
+  const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
     if (plan) {
@@ -56,6 +58,7 @@ const PlanDialog: NextPage<PlanProps> = (props) => {
         onHide();
       })
     } else {
+      setLoading(true)
       fetch('/api/plan', {
         body: JSON.stringify({
           title: newPlan.title,
@@ -79,7 +82,12 @@ const PlanDialog: NextPage<PlanProps> = (props) => {
     return (
       <div>
         <Button label="Cancel" icon="pi pi-times" onClick={onHide} className="p-button-text" />
-        <Button label="Confirm" icon="pi pi-check" onClick={handleSubmit(onSubmit)} autoFocus />
+        <Button
+          label="Confirm"
+          loading={isLoading}
+          icon="pi pi-check"
+          onClick={handleSubmit(onSubmit)} autoFocus
+        />
       </div>
     );
   }
