@@ -63,6 +63,14 @@ const PlaceList: NextPage<Props> = (props) => {
         {items != undefined && items?.filter((obj) => {
           if (!activeCat) return true
           return obj.category == activeCat
+        }).sort((a, b) => {
+          if (a._count.ScheduledItem > b._count.ScheduledItem) {
+            return 1
+          }
+          if (a._count.ScheduledItem < b._count.ScheduledItem) {
+            return -1
+          }
+          return 0
         }).map((obj) => (
           <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
         ))}

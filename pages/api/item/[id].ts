@@ -13,6 +13,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const getItem = await prisma.item.findUnique({
         where: {
           id: parseInt(String(itemId)),
+        },
+        include: {
+          _count: {
+            select: {
+              ScheduledItem: true
+            }
+          }
         }
       })
       getItem ? res.json(getItem) : res.status(404).end('Item Not Found')

@@ -5,7 +5,7 @@ import { Card } from 'primereact/card';
 import { Button } from 'primereact/button'
 import { Category, Item } from "@prisma/client";
 import { mutate } from "swr";
-import { CalendarEvent } from "../lib/swr";
+import { CalendarEvent, ItemInclude } from "../lib/swr";
 import { DragEvent, useEffect, useRef, useState } from "react";
 import { createRoot } from 'react-dom/client';
 import { confirmDialog } from "primereact/confirmdialog";
@@ -13,8 +13,8 @@ import { MenuItem } from "primereact/menuitem";
 import { Menu } from "primereact/menu";
 
 interface Props {
-  item: Item
-  handleEdit: (item: Item) => void
+  item: ItemInclude
+  handleEdit: (item: ItemInclude) => void
   handleDragStart: (item: CalendarEvent) => void
 }
 
@@ -134,7 +134,11 @@ const PlaceCard: NextPage<Props> = (props) => {
         <Card
           header={header}
           title={title}
-          className="h-full overflow-hidden"
+          className={`
+            h-full 
+            overflow-hidden 
+            ${item._count.ScheduledItem > 0 ? "grayscale" : ""}`
+          }
         >
           {item.notes && <p>{item.notes}</p>}
         </Card>
