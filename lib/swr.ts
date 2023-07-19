@@ -43,6 +43,18 @@ const planWithItems = Prisma.validator<Prisma.PlanArgs>()({
 
 export type PlanWithItems = Prisma.PlanGetPayload<typeof planWithItems>
 
+const itemInclude = Prisma.validator<Prisma.ItemArgs>()({
+  include: {
+    _count: {
+      select: {
+        ScheduledItem: true
+      }
+    }
+  }
+})
+
+export type ItemInclude = Prisma.ItemGetPayload<typeof itemInclude>
+
 export class CalendarEvent {
   title: string
   category: Category
@@ -66,18 +78,18 @@ export class CalendarEvent {
   }
 }
 
-export const useItem = (itemId: number | undefined) => {
-  const { data, error, isLoading } = useSWR<Item>(itemId ? `/api/item/${itemId}` : null, fetcher)
+// export const useItem = (itemId: number | undefined) => {
+//   const { data, error, isLoading } = useSWR<ItemInclude>(itemId ? `/api/item/${itemId}` : null, fetcher)
 
-  return {
-    item: data,
-    isLoading,
-    isError: error
-  }
-}
+//   return {
+//     item: data,
+//     isLoading,
+//     isError: error
+//   }
+// }
 
 export const useItems = (planId: string | string[] | undefined) => {
-  const { data, error, isLoading } = useSWR<Item[]>(`/api/item?planId=${planId}`, fetcher)
+  const { data, error, isLoading } = useSWR<ItemInclude[]>(`/api/item?planId=${planId}`, fetcher)
 
   return {
     items: data,
