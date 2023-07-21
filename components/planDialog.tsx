@@ -120,8 +120,7 @@ const PlanDialog: NextPage<PlanProps> = (props) => {
                     selectionMode="single"
                     inputId={field.name}
                     value={field.value}
-                    //@ts-ignore
-                    onChange={field.onChange}
+                    onChange={(e) => field.onChange(e.value as Date)}
                     dateFormat="dd/mm/yy"
                     className={classNames({ 'p-invalid': fieldState.error })}
                   />

@@ -23,7 +23,7 @@
     "next": "^13.4.1",
     "next-auth": "^4.22.1",
     "primeicons": "^6.0.1",
-    "primereact": "^9.5.0",
+    "primereact": "^9.6.0",
     "react": "18.2.0",
     "react-big-calendar": "^1.6.9",
     "react-dnd": "^16.0.1",

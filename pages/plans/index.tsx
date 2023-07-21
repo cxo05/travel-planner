@@ -45,7 +45,6 @@ const PlansPage: NextPage<Plans> = ({ plans }) => {
   const footer = (users: User[]) => (
     <AvatarGroup>
       {users.map((user) => (
-        //@ts-ignore
         <Avatar key={user.id} image={user.image || ''} shape='circle' pt={{ image: { "referrerPolicy": "no-referrer" } }}></Avatar>
       ))}
       {/* <Avatar label="+2" shape="circle" size="large" style={{ backgroundColor: '#9c27b0', color: '#ffffff' }} /> */}
