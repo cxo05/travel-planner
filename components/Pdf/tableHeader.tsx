@@ -11,32 +11,39 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     alignItems: 'center',
     height: 24,
-    textAlign: 'center',
     fontStyle: 'bold',
     flexGrow: 1,
   },
-  date: {
-    width: '20%',
+  cell: {
+    flexDirection: 'row',
+    height: "100%",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRightColor: borderColor,
     borderRightWidth: 1,
   },
+  date: {
+    width: '20%'
+  },
   time: {
-    width: '20%',
-    borderRightColor: borderColor,
-    borderRightWidth: 1,
+    width: '20%'
   },
   event: {
     width: '60%',
-    borderRightColor: borderColor,
-    borderRightWidth: 1,
   }
 });
 
 const TableHeader = () => (
-  <View style={styles.container}>
-    <Text style={styles.date}>Date</Text>
-    <Text style={styles.time}>Time</Text>
-    <Text style={styles.event}>Event</Text>
+  <View style={styles.container} >
+    <View style={[styles.cell, styles.date]}>
+      <Text>Date</Text>
+    </View>
+    <View style={[styles.cell, styles.time]}>
+      <Text>Time</Text>
+    </View>
+    <View style={[styles.cell, styles.event]}>
+      <Text>Event</Text>
+    </View>
   </View>
 );
 

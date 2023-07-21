@@ -75,8 +75,6 @@ const PDFView = ({ plan }: Plan) => {
       return result;
     }, {} as { [key: string]: typeof plan.ScheduledItems })
 
-  console.log(groupByDate)
-
   let rows = [];
 
   for (const [key, value] of Object.entries(groupByDate)) {
@@ -88,7 +86,7 @@ const PDFView = ({ plan }: Plan) => {
           width: "80%"
         }}>
           {
-            value.map((item) => {
+            value.reverse().map((item) => {
               const startTime = new Date(item.startDate).toLocaleTimeString([], { timeStyle: "short" })
               const endTime = new Date(item.endDate).toLocaleTimeString([], { timeStyle: "short" })
               return (
@@ -110,9 +108,7 @@ const PDFView = ({ plan }: Plan) => {
 
   return (
     <PDFViewer className='w-full h-full'>
-      <Document
-        title={plan.title}
-      >
+      <Document title={plan.title}>
         <Page size="A4" style={styles.page}>
           <View style={styles.section}>
             {/* PDF Header */}
