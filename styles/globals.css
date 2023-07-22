@@ -47,20 +47,6 @@ a {
     rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
 }
 
-/* #customScroll::-webkit-scrollbar {
-  width: 5px;
-}
-
-#customScroll::-webkit-scrollbar-track {
-  background-color: rgb(255 255 255 / 10%);
-  border-radius: 10px;
-}
-
-#customScroll::-webkit-scrollbar-thumb {
-  background-color: #fff;
-  border-radius: 10px;
-} */
-
 .pac-container {
   z-index: 9999;
 }

@@ -2,6 +2,7 @@ import PlaceCard from './placeCard';
 import AddEditItemDialog from './addEditItemDialog';
 
 import { SelectButton } from 'primereact/selectbutton';
+import { ScrollPanel } from 'primereact/scrollpanel';
 import { useState } from 'react';
 import { Button } from 'primereact/button';
 import { Category, Item } from '@prisma/client';
@@ -59,22 +60,24 @@ const PlaceList: NextPage<Props> = (props) => {
         <div className='flex-grow'></div>
         <Button icon="pi pi-times" rounded text severity="secondary" onClick={handleClose}></Button>
       </div>
-      <div id="customScroll" className="flex flex-nowrap overflow-x-auto gap-4 items-stretch p-4">
-        {items != undefined && items?.filter((obj) => {
-          if (!activeCat) return true
-          return obj.category == activeCat
-        }).sort((a, b) => {
-          if (a._count.ScheduledItem > b._count.ScheduledItem) {
-            return 1
-          }
-          if (a._count.ScheduledItem < b._count.ScheduledItem) {
-            return -1
-          }
-          return 0
-        }).map((obj) => (
-          <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
-        ))}
-      </div>
+      <ScrollPanel className='h-[360px]'>
+        <div className="flex flex-nowrap flex-row gap-4 px-4 pt-4 h-full w-fit items-stretch">
+          {items != undefined && items?.filter((obj) => {
+            if (!activeCat) return true
+            return obj.category == activeCat
+          }).sort((a, b) => {
+            if (a._count.ScheduledItem > b._count.ScheduledItem) {
+              return 1
+            }
+            if (a._count.ScheduledItem < b._count.ScheduledItem) {
+              return -1
+            }
+            return 0
+          }).map((obj) => (
+            <PlaceCard key={obj.id} item={obj} handleEdit={handleEditPopUp} handleDragStart={handleDragStart}></PlaceCard>
+          ))}
+        </div>
+      </ScrollPanel>
     </div>
   );
 };

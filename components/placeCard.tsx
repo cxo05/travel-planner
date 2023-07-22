@@ -95,55 +95,53 @@ const PlaceCard: NextPage<Props> = (props) => {
   </div>
 
   return (
-    <>
-      <div
-        draggable="true"
-        className="lg:basis-1/6 md:basis-1/5 grow-0 shrink-0 max-w-xs"
-        onDragStart={(event: DragEvent) => {
-          let color = 'bg-lime-500'
-          switch (item.category) {
-            case Category.FOOD:
-              color = 'bg-teal-400'
-              break
-            case Category.SIGHTSEEING:
-              color = 'bg-lime-500'
-              break
-          }
-          let dragImage =
-            <div className={'rounded-md ' + color}>
-              <span className="p-2">{item.name}</span>
-            </div>
+    <div
+      draggable="true"
+      className="lg:basis-1/6 md:basis-1/5 grow-0 shrink-0 max-w-xs"
+      onDragStart={(event: DragEvent) => {
+        let color = 'bg-lime-500'
+        switch (item.category) {
+          case Category.FOOD:
+            color = 'bg-teal-400'
+            break
+          case Category.SIGHTSEEING:
+            color = 'bg-lime-500'
+            break
+        }
+        let dragImage =
+          <div className={'rounded-md ' + color}>
+            <span className="p-2">{item.name}</span>
+          </div>
 
-          var ghost = document.createElement('div');
-          ghost.style.transform = "translate(-10000px, -10000px)";
-          ghost.style.position = "absolute";
-          document.body.appendChild(ghost);
-          event.dataTransfer.setDragImage(ghost, 0, 0);
-          const root = createRoot(ghost);
+        var ghost = document.createElement('div');
+        ghost.style.transform = "translate(-10000px, -10000px)";
+        ghost.style.position = "absolute";
+        document.body.appendChild(ghost);
+        event.dataTransfer.setDragImage(ghost, 0, 0);
+        const root = createRoot(ghost);
 
-          root.render(dragImage);
-          let scheduledItem: CalendarEvent = {
-            itemId: item.id,
-            planId: item.planId,
-            title: item.name,
-            category: item.category
-          }
-          handleDragStart(scheduledItem)
-        }}
-      >
-        <Card
-          header={header}
-          title={title}
-          className={`
+        root.render(dragImage);
+        let scheduledItem: CalendarEvent = {
+          itemId: item.id,
+          planId: item.planId,
+          title: item.name,
+          category: item.category
+        }
+        handleDragStart(scheduledItem)
+      }}
+    >
+      <Card
+        header={header}
+        title={title}
+        className={`
             h-full 
             overflow-hidden 
             ${item._count.ScheduledItem > 0 ? "grayscale" : ""}`
-          }
-        >
-          {item.notes && <p>{item.notes}</p>}
-        </Card>
-      </div>
-    </>
+        }
+      >
+        {item.notes && <p>{item.notes}</p>}
+      </Card>
+    </div>
   )
 };
 
