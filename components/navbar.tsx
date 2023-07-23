@@ -13,8 +13,8 @@ const Navbar = () => {
   const { plan } = usePlan(router.query.id || '')
 
   return (
-    <div className='fixed top-0 w-full'>
-      <nav className="flex flex-col justify-center overflow-hidden bg-gray-50">
+    <div className='fixed top-0 w-full z-50'>
+      <nav className="flex flex-col justify-center bg-gray-50">
         <div className='bg-blue-400'>
           <div className="flex items-center justify-between container mx-auto p-3">
             <div className="text-lg font-bold text-gray-100">Travel Planner</div>

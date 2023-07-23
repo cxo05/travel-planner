@@ -122,7 +122,7 @@ const PlanPage = () => {
   if (isErrorItem || isErrorPlan) return <div>An error occured</div>
 
   return (
-    <div className='h-full pt-2'>
+    <div className='pt-2 pb-[460px]'>
       <div style={{ height: "800px" }}>
         <UndoRedoContext.Provider value={{ state, setState, setInitialState, undo, redo, reset, isUndoPossible, isRedoPossible }}>
           <DnDCalendar

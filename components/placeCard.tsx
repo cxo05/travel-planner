@@ -97,7 +97,7 @@ const PlaceCard: NextPage<Props> = (props) => {
   return (
     <div
       draggable="true"
-      className="lg:basis-1/6 md:basis-1/5 grow-0 shrink-0 max-w-xs"
+      className="w-[14rem] sm:min-w-[16rem] md:min-w-[18rem]"
       onDragStart={(event: DragEvent) => {
         let color = 'bg-lime-500'
         switch (item.category) {
