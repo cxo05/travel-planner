@@ -8,13 +8,16 @@ Built with the [PrimeReact](https://github.com/primefaces/primereact) UI Compone
 
 **Drag and Drop Calendar Schedular**
 ![Alt text](docs/calendar.png)
+
 **Google Maps Support\***
-![Alt text](docs/googlemaps.png)
+_\*May be disabled due to rate limits/costs_
+<img src="docs/googlemaps.png" alt="drawing" width="500"/>
+
 **Collaborative Plans**
 Share your plan with other users
+
 **Export schedule to PDF**
 ![Alt text](docs/export_pdf.png)
-\*May be disabled due to rate limits/costs
 
 ## Development
 
