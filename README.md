@@ -1,20 +1,41 @@
 # Travel Planner
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+A web travel scheduler made to be simple, easy to use and robust. Easily plan out trips and add details such as flights, hotels, sightseeing activities, meals and other miscellaneous tasks without ads, offers and other unnecessary information being shoved into your face!
 
-Using supabase for postgresql database hosting.
+Built with the [PrimeReact](https://github.com/primefaces/primereact) UI Component Library and uses [Supabase](https://supabase.com/) for postgresql database hosting.
 
-## Prerequisites
+## Features
 
-- [Node.js](https://nodejs.org/en/)
-
-## Design
-
-Currently using Figma for design documents and architecture diagram [here](https://www.figma.com/file/NgzQ2JTh6JCDEbreHfhXjl/Travel-Planner?type=design&node-id=0%3A1&t=IEqm8urpnaggiFie-1)
+**Drag and Drop Calendar Schedular**
+![Alt text](docs/calendar.png)
+**Google Maps Support\***
+![Alt text](docs/googlemaps.png)
+**Collaborative Plans**
+Share your plan with other users
+**Export schedule to PDF**
+![Alt text](docs/export_pdf.png)
+\*May be disabled due to rate limits/costs
 
 ## Development
 
-Add .env file to root directory with database url and change the password placeholder
+### Prerequisites
+
+- [Node.js](https://nodejs.org/en/)
+
+### Setup
+
+Clone this repository and `npm install`
+
+Add a .env file to root directory with the following
+
+- DATABASE_URL
+- GOOGLE_CLIENT_ID (Login)
+- GOOGLE_CLIENT_SECRET (Login)
+- NEXTAUTH_SECRET (Production)
+- NEXTAUTH_URL (Production)
+- GOOGLE_API_KEY (Maps)
+
+E.g.
 
 ```bash
 echo "DATABASE_URL=\"postgresql://postgres:[PASSWORD]@db.bnrwmpaxrfhfoetnsttq.supabase.co:5432/postgres\"" >> .env
@@ -30,13 +51,9 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-## Database
+### Database
 
 Pushing changes to database schema
 
@@ -44,10 +61,7 @@ Pushing changes to database schema
 npx prisma db push
 
 npx prisma generate
-```
 
-Adding data
-
-```bash
+# Adding/Viewing data manually
 npx prisma studio
 ```
